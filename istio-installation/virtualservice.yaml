@@ -15,7 +15,7 @@ spec:
         prefix: "/"
     route:
     - destination:
-        host: echoserver-local.shop.svc.cluster.local
+        host: echoserver.echoserver.svc.cluster.local
 
 
 
