@@ -6,7 +6,7 @@ resource "random_string" "random" {
 
 
 module "aks-westeurope" {
-  source                           = "git::https://github.com/Azure/terraform-azurerm-aks.git?ref=efcb4fcfa2e030259623a3806e3f803e3c7c9f4a"
+  source                           = "git::https://github.com/Azure/terraform-azurerm-aks.git?ref=main"
   resource_group_name              = azurerm_resource_group.westeurope.name
   kubernetes_version               = "1.23.5"
   orchestrator_version             = "1.23.5"
@@ -19,7 +19,7 @@ module "aks-westeurope" {
   rbac_aad_admin_group_object_ids  = var.rbac_aad_admin_group_object_ids
   rbac_aad_managed                 = true
   private_cluster_enabled          = false
-  enable_http_application_routing  = true
+  enable_http_application_routing  = false
   azure_policy_enabled             = true
   enable_auto_scaling              = true
   enable_host_encryption           = false
@@ -41,9 +41,9 @@ module "aks-westeurope" {
     "Agent" : "defaultnodepoolagent"
   }
 
-  enable_ingress_application_gateway = false
-  #ingress_application_gateway_name        = "aks-agw"
-  #ingress_application_gateway_subnet_cidr = "10.52.1.0/24"
+  enable_ingress_application_gateway    = true
+  ingress_application_gateway_name      = "aks-agw-westeurope"
+  ingress_application_gateway_subnet_id = module.network-westeurope.vnet_subnets[3]
 
   network_policy                 = "azure"
   net_profile_dns_service_ip     = "10.0.0.10"
@@ -58,7 +58,7 @@ module "aks-westeurope" {
 }
 
 module "aks-eastus" {
-  source                           = "git::https://github.com/Azure/terraform-azurerm-aks.git?ref=efcb4fcfa2e030259623a3806e3f803e3c7c9f4a"
+  source                           = "git::https://github.com/Azure/terraform-azurerm-aks.git?ref=main"
   resource_group_name              = azurerm_resource_group.eastus.name
   kubernetes_version               = "1.23.5"
   orchestrator_version             = "1.23.5"
@@ -71,7 +71,7 @@ module "aks-eastus" {
   rbac_aad_admin_group_object_ids  = var.rbac_aad_admin_group_object_ids
   rbac_aad_managed                 = true
   private_cluster_enabled          = false
-  enable_http_application_routing  = true
+  enable_http_application_routing  = false
   azure_policy_enabled             = true
   enable_auto_scaling              = true
   enable_host_encryption           = false
@@ -93,9 +93,9 @@ module "aks-eastus" {
     "Agent" : "defaultnodepoolagent"
   }
 
-  enable_ingress_application_gateway = false
-  #ingress_application_gateway_name        = "aks-agw"
-  #ingress_application_gateway_subnet_cidr = "10.52.1.0/24"
+  enable_ingress_application_gateway    = true
+  ingress_application_gateway_name      = "aks-agw-eastus"
+  ingress_application_gateway_subnet_id = module.network-eastus.vnet_subnets[3]
 
   network_policy                 = "azure"
   net_profile_dns_service_ip     = "10.1.0.10"
