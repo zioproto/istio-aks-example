@@ -72,9 +72,11 @@ az keyvault secret set --vault-name $keyvaultname --name $cluster-cert-chain --f
 az keyvault certificate import --vault-name $keyvaultname -n $cluster-ca-cert -f ca-cert-and-key.pem );
 done
 ```
+# Create the ServiceProviderClass
 
 Now we create the Service Provider Class that will allow us to consume secrets from the Azure Key Vault.
-The Service Provider Class needs to stay in the istio-system namespace that we create now:
+The Service Provider Class needs to stay in the istio-system namespace that we create now.
+Run these commands from your Terraform folder:
 
 ```
 for cluster in eastus-aks westeurope-aks ; do kubectl create --context=$cluster namespace istio-system; done
@@ -128,7 +130,7 @@ istioctl x create-remote-secret --context=westeurope-aks --name=westeurope-aks |
 istioctl x create-remote-secret --context=eastus-aks --name=eastus-aks | k apply -f - --context=westeurope-aks
 ```
 
-# Validate
+# Validate multicluster east west connectivity
 
 At this point verify that the clusters are connected and synced:
 
@@ -158,6 +160,51 @@ kubectl apply --context=eastus-aks -n echoserver -f istio-installation/echoserve
 Now lets access the echoserver from the remote cluster in eastus:
 
 ```
-kubectl run --context=eastus-aks -ti curlclient --image=nicolaka/netshoot /bin/bash
+kubectl run --context=eastus-aks -n echoserver -ti curlclient --image=nicolaka/netshoot /bin/bash
 $ curl echoserver:8080
+```
+# Expose the Istio ingress gateway
+
+Note that in `004-ingress-gateway.yaml` we patches the istio-ingressgateway service to be
+`ClusterIP`, because we are going to expose it now with an Application Gateway.
+
+Lets configure the ingress and the gateway:
+
+```
+kubectl apply -f istio-installation/gateway.yaml
+kubectl apply -f istio-installation/ingress.yaml
+```
+
+Now you can reach the envoy of the istio-ingressgateway and you will get a HTTP 404:
+
+```
+curl -v $(kubectl get ingress -n istio-ingress istio-ingress-application-gateway -o json | jq -r '.status.loadBalancer.ingress[0].ip')
+*   Trying x.x.x.x:80...
+* Connected to x.x.x.x (x.x.x.x) port 80 (#0)
+> GET / HTTP/1.1
+> Host: x.x.x.x
+> User-Agent: curl/7.79.1
+> Accept: */*
+>
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 404 Not Found
+< Date: Wed, 13 Jul 2022 12:05:00 GMT
+< Content-Length: 0
+< Connection: keep-alive
+< server: istio-envoy
+<
+* Connection #0 to host x.x.x.x left intact
+```
+
+To actually reach the echoserver create the VirtualService
+
+```
+ sed -i -e "s/x.x.x.x/$(kubectl get ingress -n istio-ingress istio-ingress-application-gateway -o json | jq -r '.status.loadBalancer.ingress[0].ip')/" istio-installation/virtualservice.yaml
+kubectl apply -f istio-installation/virtualservice.yaml
+```
+
+Now you have to use the hostname to curl:
+
+```
+curl -v $(kubectl get ingress -n istio-ingress istio-ingress-application-gateway -o json | jq -r '.status.loadBalancer.ingress[0].ip').nip.io
 ```
