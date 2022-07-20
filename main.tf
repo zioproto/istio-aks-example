@@ -6,7 +6,7 @@ resource "random_string" "random" {
 
 
 module "aks-westeurope" {
-  source                            = "github.com/Azure/terraform-azurerm-aks"
+  source                            = "git::https://github.com/lonegunmanb/terraform-azurerm-aks.git?ref=a9a27b242b0828575fe7d127208d843b11e7d972"
   resource_group_name               = azurerm_resource_group.westeurope.name
   kubernetes_version                = "1.23.5"
   orchestrator_version              = "1.23.5"
@@ -58,7 +58,7 @@ module "aks-westeurope" {
 }
 
 module "aks-eastus" {
-  source                            = "github.com/Azure/terraform-azurerm-aks"
+  source                            = "git::https://github.com/lonegunmanb/terraform-azurerm-aks.git?ref=a9a27b242b0828575fe7d127208d843b11e7d972"
   resource_group_name               = azurerm_resource_group.eastus.name
   kubernetes_version                = "1.23.5"
   orchestrator_version              = "1.23.5"
