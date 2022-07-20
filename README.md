@@ -168,6 +168,8 @@ $ curl echoserver:8080
 Note that in `004-ingress-gateway.yaml` we patches the istio-ingressgateway service to be
 `ClusterIP`, because we are going to expose it now with an Application Gateway.
 
+We are now going to expose the `istio-ingressgateway` on 1 AKS cluster, you can apply the following both clusters if you want:
+
 Lets configure the ingress and the gateway:
 
 ```
@@ -208,3 +210,127 @@ Now you have to use the hostname to curl:
 ```
 curl -v $(kubectl get ingress -n istio-ingress istio-ingress-application-gateway -o json | jq -r '.status.loadBalancer.ingress[0].ip').nip.io
 ```
+
+# End to End TLS
+
+Now that you understand the basics of exposing the `istio-ingressgateway` behind an Application Gateway Ingress,
+let's extend our configuration to upgrade to a TLS connection also the connectivity between the Application Gateway
+and the backend `istio-ingressgateway`. What we describe in the following is a summary of the 2 documentation pages:
+
+* https://azure.github.io/application-gateway-kubernetes-ingress/features/appgw-ssl-certificate/
+* https://azure.github.io/application-gateway-kubernetes-ingress/tutorials/tutorial.e2e-ssl/
+
+For simplicity we are going to show the steps for the cluster `westeurope-aks` only.
+
+## Frontend certificate
+
+The frontend certificate, is the certificate the Application Gateway Ingress will serve to the clients on the Internet. For the sake of simplicity we just create a self signed certificate in our Azure Key Vault:
+
+```
+export keyvaultname=$(az keyvault list -g keyvault-rg -o json |jq -r '.[0].name')
+az keyvault certificate create --vault-name $keyvaultname -n mycert -p "$(az keyvault certificate get-default-policy -o json)"
+versionedSecretId=$(az keyvault certificate show -n mycert --vault-name $keyvaultname --query "sid" -o tsv)
+unversionedSecretId=$(echo $versionedSecretId | cut -d'/' -f-5) # remove the version from the url\n\n
+```
+
+These steps create a certificate with `CN=CLIGetDefaultPolicy`. You can modify the default-policy or provide a proper certificate if you wish.
+
+Now we import that certificate from Azure Key Vault to the Application Gateway. To do this we also need to make sure the application-gateway has the permission to read secrets from the Azure Key Vault.
+
+```
+# Get the resource group name of the AKS cluster
+aksResourceGroupName=$(az aks show --name westeurope-aks --resource-group istio-aks-westeurope --query nodeResourceGroup --output tsv)
+
+# get principalId of the AGIC managed identity
+agicIdentityPrincipalId=$(az identity show --name ingressapplicationgateway-westeurope-aks --resource-group $aksResourceGroupName --query principalId --output tsv)
+
+# One time operation, create user-assigned managed identity
+az identity create -n appgw-id -g istio-aks-westeurope -l westeurope
+identityID=$(az identity show -n appgw-id -g istio-aks-westeurope -o tsv --query "id")
+identityPrincipal=$(az identity show -n appgw-id -g istio-aks-westeurope -o tsv --query "principalId")
+
+# One time operation, assign AGIC identity to have operator access over AppGw identity
+az role assignment create --role "Managed Identity Operator" --assignee $agicIdentityPrincipalId --scope $identityID
+
+# One time operation, assign the identity to Application Gateway
+az network application-gateway identity assign \
+                              --gateway-name aks-agw-westeurope \
+                              --resource-group istio-aks-westeurope \
+                              --identity $identityID
+
+# One time operation, assign the identity GET secret access to Azure Key Vault
+az keyvault set-policy \
+            -n $keyvaultname \
+            -g istio-aks-westeurope \
+            --object-id $identityPrincipal \
+            --secret-permissions get
+
+# Now that the application-gateway can read secrets from Azure Key Vault we can import the certificate:
+az network application-gateway ssl-cert create \
+                               -n mykvsslcert \
+                               --gateway-name  aks-agw-westeurope \
+                               --resource-group $aksResourceGroupName \
+                               --key-vault-secret-id $unversionedSecretId
+
+```
+
+The name `mykvsslcert` is going to be used later in the ingress annotations to reference this certificate.
+
+## Backend certificate
+
+For the connection to the backend, we need the `application-gateway` to trust certificates emitted by the Istio CA, because we are going to use a Istio CA certificate for the `istio-ingressgateway` pod. To do this we add our `root-cert.pem` certificate to the `application-gateway`:
+
+```
+ az network application-gateway root-cert create \
+                                --gateway-name aks-agw-westeurope \
+                                -g $aksResourceGroupName \
+                                --name backend-tls \
+                                --cert-file root-cert.pem
+```
+
+Let's generate a x509 certificate signed by the Istio CA and lets upload it to Azure Key Vault:
+
+```
+cd <istiorepo>/certs
+mkdir echoserver
+cd echoserver
+openssl req -out echoserver.echoserver.svc.cluster.local.csr -newkey rsa:2048 -nodes -keyout echoserver.echoserver.svc.cluster.local.key -subj "/CN=echoserver.echoserver.svc.cluster.local/O=Istio Services"
+
+openssl x509 -req -sha256 -days 365 -CA ../root-cert.pem -CAkey ../root-key.pem -set_serial 1 -in echoserver.echoserver.svc.cluster.local.csr  -out echoserver.echoserver.svc.cluster.local.pem
+
+cat echoserver.echoserver.svc.cluster.local.pem echoserver.echoserver.svc.cluster.local.key > echoserver.pem
+export keyvaultname=$(az keyvault list -g keyvault-rg -o json |jq -r '.[0].name')
+az keyvault certificate import --vault-name $keyvaultname -n echoserver -f echoserver.pem
+
+```
+
+We need to create a `SecretProviderClass` in the `istio-ingress` namespace to read this certificate from Kubernetes. We also need to patch the `ingressgateway` deployment to mount the certificate in the pods.
+
+```
+terraform output -raw secret-provider-class-ingress | kubectl --context=westeurope-aks -n istio-ingress apply -f -
+
+cd cd istio-installation
+
+istioctl install -y \
+  --context=westeurope-aks \
+  --set profile=minimal \
+  --revision=1-14-1 \
+  --set tag=1.14.1 \
+  -f 001-accessLogFile.yaml \
+  -f 002-multicluster-westeurope.yaml \
+  -f 003-istiod-csi-secrets.yaml \
+  -f 004-ingress-gateway-csi.yaml # <-- note the "-csi" file
+
+kubectl apply -f gateway-tls.yaml -f virtualservice-tls.yaml -f ingress-tls-e2e.yaml
+
+```
+
+# Verify and troubleshoot
+
+Lets try to reach the echoserver exposed with the Ingress using TLS:
+
+```
+curl -kv https://$(kubectl get ingress -n istio-ingress istio-ingress-application-gateway -o json | jq -r '.status.loadBalancer.ingress[0].ip').nip.io
+```
+
+Note that the `-k` parameter in curl is needed because we used a self-signed certificate for the frontend.
