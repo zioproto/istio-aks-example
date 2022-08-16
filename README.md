@@ -72,6 +72,9 @@ az keyvault secret set --vault-name $keyvaultname --name $cluster-cert-chain --f
 az keyvault certificate import --vault-name $keyvaultname -n $cluster-ca-cert -f ca-cert-and-key.pem );
 done
 ```
+
+> If the `az keyvault certificate import` step fails complaining about the PEM format, try the workaround published here: https://github.com/Azure/azure-cli/issues/8099#issuecomment-795180979
+
 # Create the ServiceProviderClass
 
 Now we create the Service Provider Class that will allow us to consume secrets from the Azure Key Vault.
