@@ -1,5 +1,11 @@
 # Multicluster Istio on AKS
 
+## ARCHIVED REPOSITORY
+
+This work moved to Azure Samples, please open issues and propose PR to the new repo:
+
+* https://github.com/Azure-Samples/aks-multi-cluster-service-mesh
+
 ## Deploy Kubernetes clusters
 
 The Terraform code in this repository is a demo that will deploy 2 AKS clusters in the regions westeurope and eastus.
