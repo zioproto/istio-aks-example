@@ -1,8 +1,11 @@
 # Multicluster Istio on AKS
 
-## ARCHIVED REPOSITORY
+## Who should read this tutorial ?
 
-This work moved to Azure Samples, please open issues and propose PR to the new repo:
+This repository shows how to do a [Multi-Primary Multicluster Istio installation](https://istio.io/latest/docs/setup/install/multicluster/multi-primary/) on [AKS](https://learn.microsoft.com/en-us/azure/aks/).
+Everything is kept as simple as possible and many Terraform parameters are hardcoded for the sake of simplicity. The goal is just to understand how the multicluster installation works, and how you can integrate with Azure Key Vault for the Istio CA certificates.
+
+If you are looking for a more production ready sample, a fork of this repo has been refactored in a proper Azure Sample:
 
 * https://github.com/Azure-Samples/aks-multi-cluster-service-mesh
 
