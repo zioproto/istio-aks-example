@@ -4,13 +4,12 @@ resource "random_string" "random" {
   upper   = false
 }
 
-
 module "aks-westeurope" {
   source                            = "Azure/aks/azurerm"
-  version                           = "6.0.0"
+  version                           = "6.1.0"
   resource_group_name               = azurerm_resource_group.westeurope.name
-  kubernetes_version                = "1.23.5"
-  orchestrator_version              = "1.23.5"
+  kubernetes_version                = var.kubernetes_version
+  orchestrator_version              = var.kubernetes_version
   prefix                            = azurerm_resource_group.westeurope.location
   network_plugin                    = "azure"
   vnet_subnet_id                    = module.network-westeurope.vnet_subnets[0]
@@ -26,7 +25,7 @@ module "aks-westeurope" {
   enable_host_encryption            = false
   log_analytics_workspace_enabled   = false
   agents_min_count                  = 1
-  agents_max_count                  = 1
+  agents_max_count                  = 5
   agents_count                      = null # Please set `agents_count` `null` while `enable_auto_scaling` is `true` to avoid possible `agents_count` changes.
   agents_max_pods                   = 100
   agents_pool_name                  = "exnodepool"
@@ -44,7 +43,7 @@ module "aks-westeurope" {
 
   ingress_application_gateway_enabled   = true
   ingress_application_gateway_name      = "aks-agw-westeurope"
-  ingress_application_gateway_subnet_id = module.network-westeurope.vnet_subnets[3]
+  ingress_application_gateway_subnet_id = module.network-westeurope.vnet_subnets[2]
 
   network_policy                 = "azure"
   net_profile_dns_service_ip     = "10.0.0.10"
@@ -60,10 +59,10 @@ module "aks-westeurope" {
 
 module "aks-eastus" {
   source                            = "Azure/aks/azurerm"
-  version                           = "6.0.0"
+  version                           = "6.1.0"
   resource_group_name               = azurerm_resource_group.eastus.name
-  kubernetes_version                = "1.23.5"
-  orchestrator_version              = "1.23.5"
+  kubernetes_version                = var.kubernetes_version
+  orchestrator_version              = var.kubernetes_version
   prefix                            = azurerm_resource_group.eastus.location
   network_plugin                    = "azure"
   vnet_subnet_id                    = module.network-eastus.vnet_subnets[0]
@@ -79,7 +78,7 @@ module "aks-eastus" {
   enable_host_encryption            = false
   log_analytics_workspace_enabled   = false
   agents_min_count                  = 1
-  agents_max_count                  = 1
+  agents_max_count                  = 5
   agents_count                      = null # Please set `agents_count` `null` while `enable_auto_scaling` is `true` to avoid possible `agents_count` changes.
   agents_max_pods                   = 100
   agents_pool_name                  = "exnodepool"
@@ -97,7 +96,7 @@ module "aks-eastus" {
 
   ingress_application_gateway_enabled   = true
   ingress_application_gateway_name      = "aks-agw-eastus"
-  ingress_application_gateway_subnet_id = module.network-eastus.vnet_subnets[3]
+  ingress_application_gateway_subnet_id = module.network-eastus.vnet_subnets[2]
 
   network_policy                 = "azure"
   net_profile_dns_service_ip     = "10.1.0.10"

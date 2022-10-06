@@ -18,11 +18,11 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "westeurope" {
-  name     = join("-", [var.resource_group_name, "westeurope"])
+  name     = "istio-aks-westeurope"
   location = "westeurope"
 }
 
 resource "azurerm_resource_group" "eastus" {
-  name     = join("-", [var.resource_group_name, "eastus"])
+  name     = "istio-aks-eastus"
   location = "eastus"
 }

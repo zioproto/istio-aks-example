@@ -1,9 +1,9 @@
 data "azurerm_client_config" "current" {}
 
 resource "azurerm_resource_group" "keyvault" {
-   name     = "keyvault-rg"
-   location = "eastus"
- }
+  name     = "keyvault-rg"
+  location = "eastus"
+}
 
 resource "azurerm_key_vault" "this" {
   name                       = "kv-${random_string.random.result}"
@@ -14,8 +14,8 @@ resource "azurerm_key_vault" "this" {
   soft_delete_retention_days = 7
 
   access_policy {
-  tenant_id    = data.azurerm_client_config.current.tenant_id
-  object_id    = data.azurerm_client_config.current.object_id
+    tenant_id = data.azurerm_client_config.current.tenant_id
+    object_id = data.azurerm_client_config.current.object_id
 
     secret_permissions = [
       "Get",
