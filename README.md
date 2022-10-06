@@ -222,8 +222,7 @@ curl -v $(kubectl get ingress -n istio-ingress istio-ingress-application-gateway
 To actually reach the echoserver create the `VirtualService`
 
 ```
- sed -i -e "s/x.x.x.x/$(kubectl get ingress -n istio-ingress istio-ingress-application-gateway -o json | jq -r '.status.loadBalancer.ingress[0].ip')/" istio-installation/virtualservice.yaml
-kubectl apply -f istio-installation/virtualservice.yaml
+ cat istio-installation/virtualservice.yaml | sed -e "s/x.x.x.x/$(kubectl get ingress -n istio-ingress istio-ingress-application-gateway -o json | jq -r '.status.loadBalancer.ingress[0].ip')/" | kubectl apply -f -
 ```
 
 Now you have to use the hostname to `curl`:
