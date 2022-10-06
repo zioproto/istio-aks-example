@@ -50,8 +50,8 @@ https://istio.io/latest/docs/tasks/security/cert-management/plugin-ca-cert/
 Short summary:
 
 ```
-git clone git@github.com:istio/istio.git
-cd istio
+curl https://storage.googleapis.com/istio-release/releases/1.15.1/istio-1.15.1-linux-amd64.tar.gz | tar -zxvf -
+cd istio-1.15.1
 mkdir certs
 cd certs
 make -f ../tools/certs/Makefile.selfsigned.mk root-ca
@@ -102,9 +102,16 @@ Lets create the `istio-ingress` namespace to install the Istio Ingressgateways f
 
 ```
 kubectl create --context=eastus-aks ns istio-ingress
-kubectl label --context=eastus-aks ns istio-ingress istio.io/rev=1-14-1
+kubectl label --context=eastus-aks ns istio-ingress istio.io/rev=1-15-1
 kubectl create --context=westeurope-aks ns istio-ingress
-kubectl label --context=westeurope-aks ns istio-ingress istio.io/rev=1-14-1
+kubectl label --context=westeurope-aks ns istio-ingress istio.io/rev=1-15-1
+```
+
+It is important to have `istioctl` matching the same version of the Istio control plane you want to install. You can install the appropriate `istioctl` binary like this:
+
+```
+curl -sL https://istio.io/downloadIstioctl | ISTIO_VERSION=1.15.1 sh -
+export PATH=$HOME/.istioctl/bin:$PATH
 ```
 
 We are now ready to install istio on both clusters:
@@ -115,21 +122,23 @@ We are now ready to install istio on both clusters:
 istioctl install -y \
   --context=eastus-aks \
   --set profile=minimal \
-  --revision=1-14-1 \
-  --set tag=1.14.1 \
+  --revision=1-15-1 \
+  --set tag=1.15.1 \
   -f 001-accessLogFile.yaml \
   -f 002-multicluster-eastus.yaml \
   -f 003-istiod-csi-secrets.yaml \
-  -f 004-ingress-gateway.yaml &&
+  -f 004-ingress-gateway.yaml \
+  -f 005-aks-affinity.yaml &&
 istioctl install -y \
   --context=westeurope-aks \
   --set profile=minimal \
-  --revision=1-14-1 \
-  --set tag=1.14.1 \
+  --revision=1-15-1 \
+  --set tag=1.15.1 \
   -f 001-accessLogFile.yaml \
   -f 002-multicluster-westeurope.yaml \
   -f 003-istiod-csi-secrets.yaml \
-  -f 004-ingress-gateway.yaml
+  -f 004-ingress-gateway.yaml \
+  -f 005-aks-affinity.yaml
 )
 ```
 
@@ -162,9 +171,9 @@ We are going to create a deployment `echoserver` only in westeurope. The service
 
 ```
 kubectl create --context=eastus-aks ns echoserver
-kubectl label --context=eastus-aks ns echoserver istio.io/rev=1-14-1
+kubectl label --context=eastus-aks ns echoserver istio.io/rev=1-15-1
 kubectl create --context=westeurope-aks ns echoserver
-kubectl label --context=westeurope-aks ns echoserver istio.io/rev=1-14-1
+kubectl label --context=westeurope-aks ns echoserver istio.io/rev=1-15-1
 kubectl apply --context=westeurope-aks -n echoserver -f istio-installation/echoserver.yaml -f istio-installation/echoserver-svc.yaml
 kubectl apply --context=eastus-aks -n echoserver -f istio-installation/echoserver-svc.yaml
 ```
@@ -338,8 +347,8 @@ cd cd istio-installation
 istioctl install -y \
   --context=westeurope-aks \
   --set profile=minimal \
-  --revision=1-14-1 \
-  --set tag=1.14.1 \
+  --revision=1-15-1 \
+  --set tag=1.15.1 \
   -f 001-accessLogFile.yaml \
   -f 002-multicluster-westeurope.yaml \
   -f 003-istiod-csi-secrets.yaml \
