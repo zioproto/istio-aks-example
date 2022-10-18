@@ -36,7 +36,7 @@ To interact with the control plane you will need a tool called `istioctl`.
 You can install it like this:
 
 ```
-curl -sL https://istio.io/downloadIstioctl | ISTIO_VERSION=1.15.1 sh -
+curl -sL https://istio.io/downloadIstioctl | ISTIO_VERSION=1.15.2 sh -
 export PATH=$HOME/.istioctl/bin:$PATH
 ```
 
