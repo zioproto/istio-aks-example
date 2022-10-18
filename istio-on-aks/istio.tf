@@ -29,7 +29,7 @@ resource "helm_release" "istiod" {
     yamlencode(
       {
         meshConfig = {
-          accessLogFile   = "/dev/stdout"
+          accessLogFile = "/dev/stdout"
         }
       }
     )

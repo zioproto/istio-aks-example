@@ -7,7 +7,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "user" {
   min_count             = 1
   max_count             = 5
   vnet_subnet_id        = module.network.vnet_subnets[0]
-  depends_on = [module.aks]
+  depends_on            = [module.aks]
 }
 
 resource "azurerm_kubernetes_cluster_node_pool" "ingress" {
@@ -19,5 +19,5 @@ resource "azurerm_kubernetes_cluster_node_pool" "ingress" {
   min_count             = 1
   max_count             = 2
   vnet_subnet_id        = module.network.vnet_subnets[0]
-  depends_on = [module.aks]
+  depends_on            = [module.aks]
 }
