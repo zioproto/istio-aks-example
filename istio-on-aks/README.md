@@ -297,6 +297,38 @@ wget https://raw.githubusercontent.com/alexei-led/nsenter/master/nsenter-node.sh
 bash nsenter-node.sh $(kubectl get pod -l run=echoserver -o jsonpath='{.items[0].spec.nodeName}')
 tcpdump -i eth0 -n -c 15 -X port 8080
 ```
+## Observability
+
+The file [prometheus.tf](prometheus.tf) installs the Helm community chart for
+Prometheus and Grafana, and creates the configuration to scrape the Istio
+sidecars.
+
+Access the Grafana dashboard:
+
+```
+kubectl port-forward svc/prometheus-grafana 3000:80
+```
+And point your browser to http://127.0.0.1:3000
+
+The default username is `admin` and  the default password is `prom-operator`.
+This information is stored in the kubernetes secret:
+
+```
+kubectl get secret prometheus-grafana -o json | jq -r '.data."admin-password"' | base64 -d
+prom-operator
+kubectl get secret prometheus-grafana -o json | jq -r '.data."admin-user"' | base64 -d
+admin
+```
+
+After logging into the Grafana web interface you can import these dashboards at
+the following URL http://127.0.0.1:3000/dashboard/import
+
+* https://grafana.com/grafana/dashboards/7645-istio-control-plane-dashboard/
+* https://grafana.com/grafana/dashboards/7639-istio-mesh-dashboard/
+* https://grafana.com/grafana/dashboards/7636-istio-service-dashboard/
+* https://grafana.com/grafana/dashboards/7630-istio-workload-dashboard/
+* https://grafana.com/grafana/dashboards/13277-istio-wasm-extension-dashboard/
+
 
 ## Authorization Policies
 
