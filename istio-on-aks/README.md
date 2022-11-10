@@ -27,6 +27,8 @@ terraform init -upgrade
 terraform apply -var-file=.tfvars
 ```
 
+Note: you need `kubectl` installed for this Terraform code to run correctly.
+
 The AKS cluster was created with 3 nodepools: `system` `user` and `ingress`.
 The Istio control plane is scheduled on the `system` nodepool.
 The Istio ingress gateway are scheduled on the `ingress` nodepool.
