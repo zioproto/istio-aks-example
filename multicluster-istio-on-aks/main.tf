@@ -6,7 +6,7 @@ resource "random_string" "random" {
 
 module "aks-westeurope" {
   source                            = "Azure/aks/azurerm"
-  version                           = "6.1.0"
+  version                           = "6.5.0"
   resource_group_name               = azurerm_resource_group.westeurope.name
   kubernetes_version                = var.kubernetes_version
   orchestrator_version              = var.kubernetes_version
@@ -59,7 +59,7 @@ module "aks-westeurope" {
 
 module "aks-eastus" {
   source                            = "Azure/aks/azurerm"
-  version                           = "6.1.0"
+  version                           = "6.5.0"
   resource_group_name               = azurerm_resource_group.eastus.name
   kubernetes_version                = var.kubernetes_version
   orchestrator_version              = var.kubernetes_version
