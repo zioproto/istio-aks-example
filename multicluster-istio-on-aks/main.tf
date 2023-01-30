@@ -81,7 +81,7 @@ module "aks-eastus" {
   agents_max_count                  = 5
   agents_count                      = null # Please set `agents_count` `null` while `enable_auto_scaling` is `true` to avoid possible `agents_count` changes.
   agents_max_pods                   = 100
-  agents_pool_name                  = "systemnodepool"
+  agents_pool_name                  = "system"
   agents_availability_zones         = ["1", "2"]
   agents_type                       = "VirtualMachineScaleSets"
   agents_size                       = var.agents_size
