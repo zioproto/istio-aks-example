@@ -10,6 +10,7 @@ module "network-eastus" {
   subnet_enforce_private_link_endpoint_network_policies = {
     "subnet1" : true
   }
+  use_for_each        = true
 }
 
 module "network-westeurope" {
@@ -23,6 +24,7 @@ module "network-westeurope" {
   subnet_enforce_private_link_endpoint_network_policies = {
     "subnet1" : true
   }
+  use_for_each        = true
 }
 
 resource "azurerm_virtual_network_peering" "east2west" {

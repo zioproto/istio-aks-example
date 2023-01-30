@@ -6,4 +6,5 @@ module "network" {
   subnet_prefixes     = ["10.52.0.0/16"]
   subnet_names        = ["system"]
   depends_on          = [azurerm_resource_group.this]
+  use_for_each        = true
 }
