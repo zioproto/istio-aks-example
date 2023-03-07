@@ -1,6 +1,6 @@
 module "aks" {
   source                           = "Azure/aks/azurerm"
-  version                          = "6.5.0"
+  version                          = "6.7.1"
   resource_group_name              = azurerm_resource_group.this.name
   kubernetes_version               = var.kubernetes_version
   orchestrator_version             = var.kubernetes_version
@@ -41,6 +41,9 @@ module "aks" {
   key_vault_secrets_provider_enabled = true
   secret_rotation_enabled            = true
   secret_rotation_interval           = "3m"
+
+  role_based_access_control_enabled = true
+  rbac_aad                          = false
 
   depends_on = [module.network]
 }
