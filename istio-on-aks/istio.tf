@@ -59,6 +59,11 @@ resource "helm_release" "istio-ingress" {
           app   = ""
           istio = "ingressgateway"
         }
+        service = {
+          annotations = {
+            "service.beta.kubernetes.io/azure-load-balancer-internal" = "true"
+          }
+        }
       }
     )
   ]

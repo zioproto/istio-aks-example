@@ -47,3 +47,12 @@ module "aks" {
 
   depends_on = [module.network]
 }
+
+# Grant AKS cluster access to use AKS subnet
+# https://github.com/Azure/terraform-azurerm-aks/issues/178
+resource "azurerm_role_assignment" "aks" {
+  principal_id         = module.aks.cluster_identity.principal_id
+  role_definition_name = "Network Contributor"
+  scope                = module.network.vnet_subnets[0]
+  depends_on           = [module.aks]
+}
