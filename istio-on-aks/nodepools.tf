@@ -6,7 +6,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "user" {
   node_count            = 1
   min_count             = 1
   max_count             = 5
-  vnet_subnet_id        = module.network.vnet_subnets[0]
+  vnet_subnet_id        = lookup(module.network.vnet_subnets_name_id, "system")
   depends_on            = [module.aks]
 }
 
@@ -18,6 +18,6 @@ resource "azurerm_kubernetes_cluster_node_pool" "ingress" {
   node_count            = 1
   min_count             = 1
   max_count             = 2
-  vnet_subnet_id        = module.network.vnet_subnets[0]
+  vnet_subnet_id        = lookup(module.network.vnet_subnets_name_id, "system")
   depends_on            = [module.aks]
 }

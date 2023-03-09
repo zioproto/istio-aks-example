@@ -6,7 +6,7 @@ module "aks" {
   orchestrator_version             = var.kubernetes_version
   prefix                           = "istio"
   network_plugin                   = "azure"
-  vnet_subnet_id                   = module.network.vnet_subnets[0]
+  vnet_subnet_id                   = lookup(module.network.vnet_subnets_name_id, "system")
   os_disk_size_gb                  = 50
   sku_tier                         = "Paid" # defaults to Free
   private_cluster_enabled          = false
@@ -53,6 +53,6 @@ module "aks" {
 resource "azurerm_role_assignment" "aks" {
   principal_id         = module.aks.cluster_identity.principal_id
   role_definition_name = "Network Contributor"
-  scope                = module.network.vnet_subnets[0]
+  scope                = lookup(module.network.vnet_subnets_name_id, "system")
   depends_on           = [module.aks]
 }

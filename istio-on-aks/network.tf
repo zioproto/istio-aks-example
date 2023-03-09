@@ -1,10 +1,13 @@
 module "network" {
-  source              = "Azure/network/azurerm"
-  vnet_name           = azurerm_resource_group.this.name
+  source              = "Azure/subnets/azurerm"
+  version             = "1.0.0"
   resource_group_name = azurerm_resource_group.this.name
-  address_space       = "10.52.0.0/16"
-  subnet_prefixes     = ["10.52.0.0/16"]
-  subnet_names        = ["system"]
-  depends_on          = [azurerm_resource_group.this]
-  use_for_each        = true
+  subnets = {
+    system = {
+      address_prefixes = ["10.52.0.0/16"]
+    }
+  }
+  virtual_network_address_space = ["10.52.0.0/16"]
+  virtual_network_location      = azurerm_resource_group.this.location
+  virtual_network_name          = azurerm_resource_group.this.name
 }
