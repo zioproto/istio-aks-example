@@ -60,18 +60,24 @@ resource "helm_release" "istio-ingress" {
           istio = "ingressgateway"
         }
         service = {
+          # https://cloud-provider-azure.sigs.k8s.io/topics/pls-integration/
           annotations = {
             "service.beta.kubernetes.io/azure-load-balancer-internal"                = "true"
             "service.beta.kubernetes.io/azure-pls-create"                            = "true"
             "service.beta.kubernetes.io/azure-pls-name"                              = "istio-ingress"
             "service.beta.kubernetes.io/azure-pls-ip-configuration-subnet"           = "plc"
-            "service.beta.kubernetes.io/azure-pls-ip-configuration-ip-address-count" = "2"
+            "service.beta.kubernetes.io/azure-pls-ip-configuration-ip-address-count" = "1"
             "service.beta.kubernetes.io/azure-pls-proxy-protocol"                    = "false"
             "service.beta.kubernetes.io/azure-pls-visibility"                        = "*"
+            "service.beta.kubernetes.io/azure-pls-auto-approval"                     = data.azurerm_subscription.current.subscription_id
+            "service.beta.kubernetes.io/azure-pls-ip-configuration-ip-address"       = "10.52.192.10"
           }
         }
       }
     )
   ]
   lint = true
+}
+
+data azurerm_subscription current {
 }

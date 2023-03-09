@@ -2,11 +2,15 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 3.10"
+      version = ">= 3.40"
     }
     kubectl = {
       source  = "gavinbunney/kubectl"
       version = ">= 1.7.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.4.3"
     }
   }
 
@@ -37,4 +41,6 @@ provider "helm" {
     cluster_ca_certificate = base64decode(module.aks.cluster_ca_certificate)
   }
 }
+
+provider random {}
 
