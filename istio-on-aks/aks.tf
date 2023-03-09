@@ -56,3 +56,10 @@ resource "azurerm_role_assignment" "aks" {
   scope                = lookup(module.network.vnet_subnets_name_id, "system")
   depends_on           = [module.aks]
 }
+
+resource "azurerm_role_assignment" "plc" {
+  principal_id         = module.aks.cluster_identity.principal_id
+  role_definition_name = "Network Contributor"
+  scope                = lookup(module.network.vnet_subnets_name_id, "plc")
+  depends_on           = [module.aks]
+}

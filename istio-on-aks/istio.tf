@@ -39,7 +39,7 @@ resource "helm_release" "istiod" {
 # $ helm install istio-ingress istio/gateway -n istio-ingress --wait
 
 resource "helm_release" "istio-ingress" {
-  depends_on        = [helm_release.istio-base, helm_release.istiod, azurerm_kubernetes_cluster_node_pool.ingress]
+  depends_on        = [helm_release.istio-base, helm_release.istiod, azurerm_kubernetes_cluster_node_pool.ingress, azurerm_role_assignment.aks, azurerm_role_assignment.plc]
   name              = "istio-ingress"
   namespace         = "istio-ingress"
   create_namespace  = "true"
@@ -61,7 +61,13 @@ resource "helm_release" "istio-ingress" {
         }
         service = {
           annotations = {
-            "service.beta.kubernetes.io/azure-load-balancer-internal" = "true"
+            "service.beta.kubernetes.io/azure-load-balancer-internal"                = "true"
+            "service.beta.kubernetes.io/azure-pls-create"                            = "true"
+            "service.beta.kubernetes.io/azure-pls-name"                              = "istio-ingress"
+            "service.beta.kubernetes.io/azure-pls-ip-configuration-subnet"           = "plc"
+            "service.beta.kubernetes.io/azure-pls-ip-configuration-ip-address-count" = "2"
+            "service.beta.kubernetes.io/azure-pls-proxy-protocol"                    = "false"
+            "service.beta.kubernetes.io/azure-pls-visibility"                        = "*"
           }
         }
       }
