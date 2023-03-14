@@ -13,7 +13,7 @@ resource "random_id" "front_door_endpoint_name" {
 resource "azurerm_cdn_frontdoor_profile" "my_front_door" {
   depends_on          = [helm_release.istio-ingress]
   name                = local.front_door_profile_name
-  resource_group_name = azurerm_resource_group.this.name
+  resource_group_name = data.azurerm_resource_group.this.name
   sku_name            = "Premium_AzureFrontDoor"
 }
 
@@ -43,7 +43,7 @@ resource "azurerm_cdn_frontdoor_origin_group" "my_origin_group" {
 data "azurerm_private_link_service" "istio-ingress" {
   depends_on                    = [helm_release.istio-ingress]
   name                          = "istio-ingress"
-  resource_group_name           = join("_", ["MC", azurerm_resource_group.this.name , module.aks.aks_name, azurerm_resource_group.this.location])
+  resource_group_name           = join("_", ["MC", data.azurerm_resource_group.this.name , "istio-aks", data.azurerm_resource_group.this.location])
 }
 
 resource "azurerm_cdn_frontdoor_origin" "istio-ingress-origin" {
@@ -62,7 +62,7 @@ resource "azurerm_cdn_frontdoor_origin" "istio-ingress-origin" {
 
   private_link {
     request_message        = "Request access"
-    location               = azurerm_resource_group.this.location
+    location               = data.azurerm_resource_group.this.location
     private_link_target_id = data.azurerm_private_link_service.istio-ingress.id
   }
 }

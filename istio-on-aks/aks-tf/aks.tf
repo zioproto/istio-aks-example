@@ -64,8 +64,3 @@ resource "azurerm_role_assignment" "plc" {
   depends_on           = [module.aks]
 }
 
-data "azurerm_lb" "kubernetes-internal" {
-  depends_on = [helm_release.istio-ingress]
-  name                = "kubernetes-internal"
-  resource_group_name = join("_", ["MC", azurerm_resource_group.this.name , module.aks.aks_name, azurerm_resource_group.this.location])
-}
