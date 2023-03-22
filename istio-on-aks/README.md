@@ -150,10 +150,14 @@ The gateway is exposed with a Kubernetes service with `type: LoadBalancer`, you 
 kubectl get service -n istio-ingress istio-ingress -o=jsonpath='{.status.loadBalancer.ingress[0].ip}'
 ```
 
-However trying to connect to this IP will result in a connection refused, Envoy
-does not have any configuration and will not bind to the TCP ports.
+This IP is a private IP address from an Internal Load Balancer, because the Kubernetes
+Service to expose the istio-ingressgateway Deployment is annotated with [`service.beta.kubernetes.io/azure-load-balancer-internal`](https://github.com/zioproto/istio-aks-example/blob/b75aeba3ac0c80c83f9a07170d5f75a69cfac80c/istio-on-aks/istio-tf/istio.tf#L71).
 
-Lets configure now  a Gateway resource:
+Even if you had a VM running in the same VNET, trying to connect to this IP
+will result in a connection refused, Envoy does not have any configuration and
+will not bind to the TCP ports.
+
+Lets configure now a Gateway resource:
 
 ```
 kubectl apply -f - <<EOF
@@ -176,10 +180,14 @@ spec:
 EOF
 ```
 
-After doing this we can see the gateway will listen on port 80 and will serve a HTTP 404:
+After doing this we can see the gateway will listen on port 80 and will serve a HTTP 404.
 
 ```
 istioctl proxy-config listener -n istio-ingress $(kubectl get pod -n istio-ingress -oname| head -n 1)
+```
+You can test the HTTP 404 from a pod or vm in the same VNET:
+
+```
 curl -v $(kubectl get service -n istio-ingress istio-ingress -o=jsonpath='{.status.loadBalancer.ingress[0].ip}')
 ```
 
@@ -191,7 +199,6 @@ The `virtualservices.networking.istio.io` describes how a request is routed to a
 
 To route requests to the echoserver `ClusterIP` service created in the default namespace,
 create the following VirtualService:
-
 
 ```
 kubectl apply -f - <<EOF
@@ -216,14 +223,15 @@ spec:
         port:
           number: 8080
 EOF
-  ```
-
-Check if you can reach the echoserver pod:
-```
-curl -v $(kubectl get service -n istio-ingress istio-ingress -o=jsonpath='{.status.loadBalancer.ingress[0].ip}')
 ```
 
-Envoy has a health check probe on port 15021, let's create a virtual service test this:
+Before Azure Front Door is actually able to deliver traffic to the Istio
+ingress gateway we must make sure the Health Check probes are successfull. Our
+Terraform deployed the orgin group with the following health probe:
+
+https://github.com/zioproto/istio-aks-example/blob/b75aeba3ac0c80c83f9a07170d5f75a69cfac80c/istio-on-aks/istio-tf/afd.tf#L35-L40
+
+Envoy has a health check probe service on port 15021, let's create a virtual service to forward the Azure Front Door Health Check probes to the envoy port 15021:
 
 ```
 kubectl apply -f - <<EOF
@@ -251,6 +259,14 @@ spec:
           number: 15021
 EOF
   ```
+
+At this point, we should be able to connect to our Front Door endpoint and see the output of the echoserver pod.
+
+Check if you can reach the echoserver pod:
+```
+curl -v $(az afd endpoint list -g istio-aks --profile-name MyFrontDoor -o json | jq -r ".[0].hostName")
+```
+
 To get more information on how to write a `VirtualService` resource the source of truth is the API docs:
 https://pkg.go.dev/istio.io/api/networking/v1beta1
 
