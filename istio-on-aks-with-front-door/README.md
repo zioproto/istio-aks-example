@@ -1,6 +1,7 @@
-# Running Istio on AKS
+# Running Istio on AKS exposing the istio-ingressgateway with Azure Front Door and Private Link
 
 The goal is to look at Istio installation and operation on Azure Kubernetes Service.
+This is a variation of the [Istio on AKS](https://github.com/zioproto/istio-aks-example/tree/main/istio-on-aks) example that includes the use of Azure Front Door and Private Link.
 
 Istio is a service mesh that helps you to encrypt, route, and observe traffic
 in your Kubernetes cluster. Istio uses Envoy, an HTTP proxy implementation
@@ -270,154 +271,9 @@ curl -v $(az afd endpoint list -g istio-aks --profile-name MyFrontDoor -o json |
 To get more information on how to write a `VirtualService` resource the source of truth is the API docs:
 https://pkg.go.dev/istio.io/api/networking/v1beta1
 
-# Use PeerAuthentications to enforce mTLS
+# Conclusion
 
-With the crd `peerauthentications.security.istio.io` [you can enforce mTLS](https://istio.io/latest/docs/reference/config/security/peer_authentication/).
-
-```
-kubectl apply -f - <<EOF
----
-apiVersion: security.istio.io/v1beta1
-kind: PeerAuthentication
-metadata:
-  name: default
-  namespace: istio-system
-spec:
-  mtls:
-    mode: STRICT
-EOF
-```
-
-It is important to remember that with `PeerAuthentication` you enforce always mTLS at the receiver of the TLS connection.
-To enforce at the client you need a [Destination Rule](https://istio.io/latest/docs/reference/config/networking/destination-rule/).
-
-## Destination Rules
-
-The [Destination Rule](https://istio.io/latest/docs/reference/config/networking/destination-rule/) makes possible to apply policies for a destination when a client starts a connection.
-
-For example applying the following `DestinationRule` the mTLS protocol is enforced when any client starts a connection. This means that the istio ingress gateway will not be able to connect to a backend without a sidecar:
-
-```
-kubectl apply -f - <<EOF
----
-apiVersion: networking.istio.io/v1beta1
-kind: DestinationRule
-metadata:
-  name: force-client-mtls
-  namespace: istio-system
-spec:
-  host: "*"
-  trafficPolicy:
-    tls:
-      mode: ISTIO_MUTUAL
-EOF
-```
-
-The Destination Rules are also used for Load Balancing.
-
-## Verify that the traffic is encrypted
-
-To verify mTLS you can use tcpdump from an AKS node. To get a privileges shell
-in the host namespace of an AKS node the easiest way is to use
-[nsenter](https://github.com/alexei-led/nsenter).
-
-```
-wget https://raw.githubusercontent.com/alexei-led/nsenter/master/nsenter-node.sh
-bash nsenter-node.sh $(kubectl get pod -l run=echoserver -o jsonpath='{.items[0].spec.nodeName}')
-tcpdump -i eth0 -n -c 15 -X port 8080
-```
-## Observability
-
-The file [prometheus.tf](prometheus.tf) installs the Helm community chart for
-Prometheus and Grafana, and creates the configuration to scrape the Istio
-sidecars.
-
-Access the Grafana dashboard:
-
-```
-kubectl port-forward svc/prometheus-grafana 3000:80
-```
-And point your browser to http://127.0.0.1:3000
-
-The default username is `admin` and  the default password is `prom-operator`.
-This information is stored in the kubernetes secret:
-
-```
-kubectl get secret prometheus-grafana -o json | jq -r '.data."admin-password"' | base64 -d
-prom-operator
-kubectl get secret prometheus-grafana -o json | jq -r '.data."admin-user"' | base64 -d
-admin
-```
-
-After logging into the Grafana web interface you can import these dashboards at
-the following URL http://127.0.0.1:3000/dashboard/import
-
-* https://grafana.com/grafana/dashboards/7645-istio-control-plane-dashboard/
-* https://grafana.com/grafana/dashboards/7639-istio-mesh-dashboard/
-* https://grafana.com/grafana/dashboards/7636-istio-service-dashboard/
-* https://grafana.com/grafana/dashboards/7630-istio-workload-dashboard/
-* https://grafana.com/grafana/dashboards/13277-istio-wasm-extension-dashboard/
-
-
-## Authorization Policies
-
-The [authorization policies](https://istio.io/latest/docs/reference/config/security/authorization-policy/) can allow or deny requests
-depending on some [conditions](https://istio.io/latest/docs/reference/config/security/conditions/).
-
-Here we just make an example, in the istio-ingress we allow requests to the
-istio ingressgateway only if the request is to the nip.io domain.  The
-[nip.io](https://nip.io) is a free simple wildcard DNS service for IP address,
-that is very convenient for this kind of example.
-
-```
-kubectl apply -f - <<EOF
----
-apiVersion: security.istio.io/v1beta1
-kind: AuthorizationPolicy
-metadata:
-  name: probe
-  namespace: istio-ingress
-spec:
-  action: ALLOW
-  rules:
-  - to:
-    - operation:
-        hosts: ["*.nip.io"]
-  selector:
-    matchLabels:
-      istio: ingressgateway
-EOF
-```
-
-When the policy is in place you should get a HTTP 403 for:
-`curl -v $(kubectl get service -n istio-ingress istio-ingress -o=jsonpath='{.status.loadBalancer.ingress[0].ip}')/`
-
-but if you append the nip.io domain the HTTP request should successfull ( 404 ):
-`curl -v $(kubectl get service -n istio-ingress istio-ingress -o=jsonpath='{.status.loadBalancer.ingress[0].ip}').nip.io/`
-
-
-## Service Entries
-
-Istio uses Kubernetes Services to create Envoy clusters. In case you need to address external services, or if you extended the Service Mesh to VMs outside of kubernetes where you are running legacy workloads, you can use the following CRDs:
-
-* `serviceentries.networking.istio.io`
-* `workloadentries.networking.istio.io`
-* `workloadgroups.networking.istio.io`
-
-If you are not using VMs you will need just [https://istio.io/latest/docs/reference/config/networking/service-entry/](https://istio.io/latest/docs/reference/config/networking/service-entry/)
-
-# IstioOperator
-
-The crd `istiooperators.install.istio.io` is used to describe the Istio configuration
-
-# TODO
-
-This tutorial still does not cover the following CRDs:
-
-* sidecars.networking.istio.io
-* envoyfilters.networking.istio.io
-* proxyconfigs.networking.istio.io
-* requestauthentications.security.istio.io
-* telemetries.telemetry.istio.io
-* wasmplugins.extensions.istio.io
+in this README you read about the important details when exposing the
+istio-ingressgateway with Azure Front Door. For other Istio information you can
+[continue with the README of the istio-on-aks example](https://github.com/zioproto/istio-aks-example/tree/main/istio-on-aks#use-peerauthentications-to-enforce-mtls).
 
