@@ -21,10 +21,20 @@ Running the Terraform code provided in this repo will provision an AKS cluster,
 and using the Terraform Helm provider Istio will be installed using the
 [helm installation method](https://istio.io/latest/docs/setup/install/helm/).
 
+The Terraform code is organized in 2 distinct projects in the folders `aks-tf`
+and `istio-tf`. This means you have to perform 2 `terraform apply` operations
+[like it is explained in the Terraform documentation of the Kubernetes
+provider](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs#stacking-with-managed-kubernetes-cluster-resources)
+
 ```
+cd aks-tf
 cp tfvars .tfvars #customize anything
 terraform init -upgrade
 terraform apply -var-file=.tfvars
+cd ../istio-tf
+az aks get-credentials --resource-group istio-aks --name istio-aks
+terraform init -upgrade
+terraform apply
 ```
 
 Note: you need `kubectl` installed for this Terraform code to run correctly.
@@ -34,19 +44,20 @@ The Istio control plane is scheduled on the `system` nodepool.
 The Istio ingress gateway are scheduled on the `ingress` nodepool.
 The `user` nodepool will host the other workloads.
 
+The Istio ingressgateway is not exposed directly to the Internet.  It is
+possible to [connect Azure Front Door Premium to an internal load balancer
+origin with Private Link](Connect Azure Front Door Premium to an internal load
+balancer origin with Private Link). Because the internal load balancer that
+exposes the istio ingressgateway is created by a Kubernetes Service of type
+LoadBalancer, I leveraged the AKS [Azure Private Link Service
+Integration](https://cloud-provider-azure.sigs.k8s.io/topics/pls-integration/)
+
 To interact with the control plane you will need a tool called `istioctl`.
 You can install it like this:
 
 ```
 curl -sL https://istio.io/downloadIstioctl | ISTIO_VERSION=1.17.1 sh -
 export PATH=$HOME/.istioctl/bin:$PATH
-```
-
-You will of course need `kubectl` and you can get credentials for the cluster
-with the command:
-
-```
-az aks get-credentials --resource-group istio-aks --name istio-aks
 ```
 
 ## Injecting the sidecar
