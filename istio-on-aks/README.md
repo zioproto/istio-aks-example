@@ -21,10 +21,20 @@ Running the Terraform code provided in this repo will provision an AKS cluster,
 and using the Terraform Helm provider Istio will be installed using the
 [helm installation method](https://istio.io/latest/docs/setup/install/helm/).
 
+The Terraform code is organized in 2 distinct projects in the folders `aks-tf`
+and `istio-tf`. This means you have to perform 2 `terraform apply` operations
+[like it is explained in the Terraform documentation of the Kubernetes
+provider](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs#stacking-with-managed-kubernetes-cluster-resources)
+
 ```
+cd aks-tf
 cp tfvars .tfvars #customize anything
 terraform init -upgrade
 terraform apply -var-file=.tfvars
+cd ../istio-tf
+az aks get-credentials --resource-group istio-aks --name istio-aks
+terraform init -upgrade
+terraform apply
 ```
 
 Note: you need `kubectl` installed for this Terraform code to run correctly.

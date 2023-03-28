@@ -39,7 +39,7 @@ resource "helm_release" "istiod" {
 # $ helm install istio-ingress istio/gateway -n istio-ingress --wait
 
 resource "helm_release" "istio-ingress" {
-  depends_on        = [helm_release.istio-base, helm_release.istiod, azurerm_kubernetes_cluster_node_pool.ingress]
+  depends_on        = [helm_release.istio-base, helm_release.istiod]
   name              = "istio-ingress"
   namespace         = "istio-ingress"
   create_namespace  = "true"
