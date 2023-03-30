@@ -1,9 +1,10 @@
 module "aks" {
-  source                           = "Azure/aks/azurerm"
-  version                          = "6.5.0"
+  source                           = "git::https://github.com/zioproto/terraform-azurerm-aks.git?ref=680acd1480c8c13551eda1c1dc8929715b5b081f"
   resource_group_name              = azurerm_resource_group.this.name
   kubernetes_version               = var.kubernetes_version
   orchestrator_version             = var.kubernetes_version
+  role_based_access_control_enabled = true
+  rbac_aad                          = false
   prefix                           = "istio"
   network_plugin                   = "azure"
   vnet_subnet_id                   = module.network.vnet_subnets[0]
@@ -13,7 +14,7 @@ module "aks" {
   http_application_routing_enabled = false
   enable_auto_scaling              = true
   enable_host_encryption           = false
-  log_analytics_workspace_enabled  = false
+  log_analytics_workspace_enabled  = true
   agents_min_count                 = 1
   agents_max_count                 = 5
   agents_count                     = null # Please set `agents_count` `null` while `enable_auto_scaling` is `true` to avoid possible `agents_count` changes.
@@ -22,6 +23,7 @@ module "aks" {
   agents_availability_zones        = ["1", "2"]
   agents_type                      = "VirtualMachineScaleSets"
   agents_size                      = var.agents_size
+  monitor_metrics                  = {}
 
   agents_labels = {
     "nodepool" : "defaultnodepool"
