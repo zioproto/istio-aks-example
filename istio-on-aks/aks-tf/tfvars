@@ -1,0 +1,1 @@
+agents_size = "Standard_DC4s_v2"
