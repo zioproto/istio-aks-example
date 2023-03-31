@@ -1,29 +1,29 @@
 module "aks" {
-  source                           = "git::https://github.com/zioproto/terraform-azurerm-aks.git?ref=680acd1480c8c13551eda1c1dc8929715b5b081f"
-  resource_group_name              = azurerm_resource_group.this.name
-  kubernetes_version               = var.kubernetes_version
-  orchestrator_version             = var.kubernetes_version
+  source                            = "git::https://github.com/zioproto/terraform-azurerm-aks.git?ref=82c91ea410173bdad12b6dd9dcdb5d649c9861f7"
+  resource_group_name               = azurerm_resource_group.this.name
+  kubernetes_version                = var.kubernetes_version
+  orchestrator_version              = var.kubernetes_version
   role_based_access_control_enabled = true
   rbac_aad                          = false
-  prefix                           = "istio"
-  network_plugin                   = "azure"
-  vnet_subnet_id                   = module.network.vnet_subnets[0]
-  os_disk_size_gb                  = 50
-  sku_tier                         = "Paid" # defaults to Free
-  private_cluster_enabled          = false
-  http_application_routing_enabled = false
-  enable_auto_scaling              = true
-  enable_host_encryption           = false
-  log_analytics_workspace_enabled  = true
-  agents_min_count                 = 1
-  agents_max_count                 = 5
-  agents_count                     = null # Please set `agents_count` `null` while `enable_auto_scaling` is `true` to avoid possible `agents_count` changes.
-  agents_max_pods                  = 100
-  agents_pool_name                 = "system"
-  agents_availability_zones        = ["1", "2"]
-  agents_type                      = "VirtualMachineScaleSets"
-  agents_size                      = var.agents_size
-  monitor_metrics                  = {}
+  prefix                            = "istio"
+  network_plugin                    = "azure"
+  vnet_subnet_id                    = module.network.vnet_subnets[0]
+  os_disk_size_gb                   = 50
+  sku_tier                          = "Paid" # defaults to Free
+  private_cluster_enabled           = false
+  http_application_routing_enabled  = false
+  enable_auto_scaling               = true
+  enable_host_encryption            = false
+  log_analytics_workspace_enabled   = false
+  agents_min_count                  = 1
+  agents_max_count                  = 5
+  agents_count                      = null # Please set `agents_count` `null` while `enable_auto_scaling` is `true` to avoid possible `agents_count` changes.
+  agents_max_pods                   = 100
+  agents_pool_name                  = "system"
+  agents_availability_zones         = ["1", "2"]
+  agents_type                       = "VirtualMachineScaleSets"
+  agents_size                       = var.agents_size
+  monitor_metrics                   = {}
 
   agents_labels = {
     "nodepool" : "defaultnodepool"
