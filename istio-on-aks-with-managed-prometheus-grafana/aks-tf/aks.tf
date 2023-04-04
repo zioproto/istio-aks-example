@@ -1,5 +1,6 @@
 module "aks" {
-  source                            = "git::https://github.com/zioproto/terraform-azurerm-aks.git?ref=82c91ea410173bdad12b6dd9dcdb5d649c9861f7"
+  source                            = "Azure/aks/azurerm"
+  version                           = "6.8.0"
   resource_group_name               = azurerm_resource_group.this.name
   kubernetes_version                = var.kubernetes_version
   orchestrator_version              = var.kubernetes_version
