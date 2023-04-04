@@ -311,29 +311,20 @@ tcpdump -i eth0 -n -c 15 -X port 8080
 ```
 ## Observability
 
-The file [prometheus.tf](prometheus.tf) installs the Helm community chart for
-Prometheus and Grafana, and creates the configuration to scrape the Istio
-sidecars.
+The file [prometheus.tf](prometheus.tf) configures Azure Managed Prometheus and
+Azure Managed Grafana.
 
 Access the Grafana dashboard:
 
 ```
-kubectl port-forward svc/prometheus-grafana 3000:80
+az grafana show -g istio-aks --name istio-grafana -o json | jq .properties.endpoint
 ```
-And point your browser to http://127.0.0.1:3000
+And point your browser to the URL displayed by this command.
 
-The default username is `admin` and  the default password is `prom-operator`.
-This information is stored in the kubernetes secret:
-
-```
-kubectl get secret prometheus-grafana -o json | jq -r '.data."admin-password"' | base64 -d
-prom-operator
-kubectl get secret prometheus-grafana -o json | jq -r '.data."admin-user"' | base64 -d
-admin
-```
+The identity that created the infrastructure with Terraform is configured as Grafana Admin.
 
 After logging into the Grafana web interface you can import these dashboards at
-the following URL http://127.0.0.1:3000/dashboard/import
+the following URL http://grafana/dashboard/import
 
 * https://grafana.com/grafana/dashboards/7645-istio-control-plane-dashboard/
 * https://grafana.com/grafana/dashboards/7639-istio-mesh-dashboard/
@@ -341,6 +332,7 @@ the following URL http://127.0.0.1:3000/dashboard/import
 * https://grafana.com/grafana/dashboards/7630-istio-workload-dashboard/
 * https://grafana.com/grafana/dashboards/13277-istio-wasm-extension-dashboard/
 
+TODO: automate the installation of the dashboards with this terraform resource https://registry.terraform.io/providers/grafana/grafana/latest/docs/resources/dashboard
 
 ## Authorization Policies
 
