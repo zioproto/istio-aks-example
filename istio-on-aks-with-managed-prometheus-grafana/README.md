@@ -21,16 +21,30 @@ Running the Terraform code provided in this repo will provision an AKS cluster,
 and using the Terraform Helm provider Istio will be installed using the
 [helm installation method](https://istio.io/latest/docs/setup/install/helm/).
 
-The Terraform code is organized in 2 distinct projects in the folders `aks-tf`
-and `istio-tf`. This means you have to perform 2 `terraform apply` operations
+The Terraform code is organized in 3 distinct projects in the folders `aks-tf`, `istio-tf` and
+`grafana-dashboards-tf`. This means you have to perform 3 `terraform apply` operations
 [like it is explained in the Terraform documentation of the Kubernetes
-provider](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs#stacking-with-managed-kubernetes-cluster-resources)
+provider](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs#stacking-with-managed-kubernetes-cluster-resources).
+The reason is that you can't configure the Terraform Grafana provider until the
+Grafana instance is deployed. In the same way you cannot configure the Helm
+and Kubernetes providers until the AKS cluster is deployed. If you use Terraform
+interpolation to configure the providers, intermittent and unpredictable errors
+will occur, because of the order in which Terraform itself evaluates the provider
+blocks and resources.
+
 
 ```
+# Deploy the AKS cluster and the Managed Prometheus and Grafana
 cd aks-tf
 cp tfvars .tfvars #customize anything
 terraform init -upgrade
 terraform apply -var-file=.tfvars
+# Deploy the additional Grafana Dashboards
+cd ../grafana-dashboards-tf
+export TF_VAR_url=$(az grafana show -g istio-aks -n istio-grafana -o json | jq -r .properties.endpoint)
+export TF_VAR_token=$(az grafana api-key create --key `date +%s` --name istio-grafana -g istio-aks -r editor --time-to-live 4m -o json | jq -r .key)
+terraform apply
+# Install Istio
 cd ../istio-tf
 az aks get-credentials --resource-group istio-aks --name istio-aks
 terraform init -upgrade
