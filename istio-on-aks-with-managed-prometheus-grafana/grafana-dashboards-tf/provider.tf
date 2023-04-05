@@ -22,10 +22,10 @@ provider "azurerm" {
 
 # https://learn.microsoft.com/en-gb/azure/managed-grafana/how-to-api-calls
 provider "grafana" {
-  # az grafana show -g istio-aks -n istio-grafana -o json | jq .properties.endpoint
-  url = "https://istio-grafana-g9ckhsdxf6ayccc3.eus.grafana.azure.com"
+  # export TF_VAR_url=$(az grafana show -g istio-aks -n istio-grafana -o json | jq -r .properties.endpoint)
+  url = var.url
 
   # To obtain the token, you can use the following command:
-  # az grafana api-key create --key keyname --name istio-grafana -g istio-aks -r editor -o json
-  auth = ""
+  # TF_VAR_token=$(az grafana api-key create --key `date +%s` --name istio-grafana -g istio-aks -r editor --time-to-live 4m -o json | jq -r .key)
+  auth = var.token
 }
