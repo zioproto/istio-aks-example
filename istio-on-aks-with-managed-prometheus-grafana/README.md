@@ -337,8 +337,8 @@ And point your browser to the URL displayed by this command.
 
 The identity that created the infrastructure with Terraform is configured as Grafana Admin.
 
-After logging into the Grafana web interface you can import these dashboards at
-the following URL http://grafana/dashboard/import
+After logging into the Grafana web interface you should see the following dashboards,
+that were installed with Terraform:
 
 * https://grafana.com/grafana/dashboards/7645-istio-control-plane-dashboard/
 * https://grafana.com/grafana/dashboards/7639-istio-mesh-dashboard/
@@ -346,7 +346,28 @@ the following URL http://grafana/dashboard/import
 * https://grafana.com/grafana/dashboards/7630-istio-workload-dashboard/
 * https://grafana.com/grafana/dashboards/13277-istio-wasm-extension-dashboard/
 
-TODO: automate the installation of the dashboards with this terraform resource https://registry.terraform.io/providers/grafana/grafana/latest/docs/resources/dashboard
+If you configured the `PeerAuthentication` to enforce mTLS ( `STRICT` ) you will not
+see any traffic in the Grafana dashboards, because the scraping of the metrics is not happening
+over mTLS and the envoy sidecars are refusing the scraping connection attempts.
+To fix this you can configure the `PeerAuthentication` to `DISABLE` on the specific scraping 15020 TCP port:
+
+```
+---
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: allow-scraping
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      run: echoserver
+  mtls:
+    mode: STRICT
+  portLevelMtls:
+    15020:
+      mode: DISABLE
+```
 
 ## Authorization Policies
 
