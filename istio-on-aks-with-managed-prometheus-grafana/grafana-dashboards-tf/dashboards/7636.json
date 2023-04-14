@@ -48,7 +48,7 @@
       }
     ]
   },
-  "description": "Istio Service Dashboard version 1.18.0-alpha.0",
+  "description": "Istio Service Dashboard version 1.17.2",
   "editable": false,
   "gnetId": 7636,
   "graphTooltip": 0,
@@ -100,7 +100,7 @@
             "rgba(237, 129, 40, 0.89)",
             "rgba(50, 172, 45, 0.97)"
           ],
-          "datasource": "",
+          "datasource": "prometheus-istio-aks",
           "fieldConfig": {
             "defaults": {
               "custom": {}
@@ -201,7 +201,7 @@
             "rgba(237, 129, 40, 0.89)",
             "rgba(245, 54, 54, 0.9)"
           ],
-          "datasource": "",
+          "datasource": "prometheus-istio-aks",
           "decimals": null,
           "fieldConfig": {
             "defaults": {
@@ -298,7 +298,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "",
+          "datasource": "prometheus-istio-aks",
           "fieldConfig": {
             "defaults": {
               "custom": {}
@@ -417,7 +417,7 @@
             "rgba(237, 129, 40, 0.89)",
             "#d44a3a"
           ],
-          "datasource": "",
+          "datasource": "prometheus-istio-aks",
           "fieldConfig": {
             "defaults": {
               "custom": {}
@@ -519,7 +519,7 @@
             "rgba(237, 129, 40, 0.89)",
             "rgba(50, 172, 45, 0.97)"
           ],
-          "datasource": "",
+          "datasource": "prometheus-istio-aks",
           "fieldConfig": {
             "defaults": {
               "custom": {}
@@ -620,7 +620,7 @@
             "rgba(237, 129, 40, 0.89)",
             "rgba(245, 54, 54, 0.9)"
           ],
-          "datasource": "",
+          "datasource": "prometheus-istio-aks",
           "decimals": null,
           "fieldConfig": {
             "defaults": {
@@ -717,7 +717,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "",
+          "datasource": "prometheus-istio-aks",
           "fieldConfig": {
             "defaults": {
               "custom": {}
@@ -836,7 +836,7 @@
             "rgba(237, 129, 40, 0.89)",
             "#d44a3a"
           ],
-          "datasource": "",
+          "datasource": "prometheus-istio-aks",
           "fieldConfig": {
             "defaults": {
               "custom": {}
@@ -974,7 +974,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "",
+          "datasource": "prometheus-istio-aks",
           "fieldConfig": {
             "defaults": {
               "custom": {}
@@ -1081,7 +1081,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "",
+          "datasource": "prometheus-istio-aks",
           "fieldConfig": {
             "defaults": {
               "custom": {}
@@ -1188,7 +1188,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "",
+          "datasource": "prometheus-istio-aks",
           "description": "",
           "fieldConfig": {
             "defaults": {
@@ -1352,7 +1352,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "",
+          "datasource": "prometheus-istio-aks",
           "fieldConfig": {
             "defaults": {
               "custom": {}
@@ -1514,7 +1514,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "",
+          "datasource": "prometheus-istio-aks",
           "fieldConfig": {
             "defaults": {
               "custom": {}
@@ -1676,7 +1676,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "",
+          "datasource": "prometheus-istio-aks",
           "fieldConfig": {
             "defaults": {
               "custom": {}
@@ -1780,7 +1780,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "",
+          "datasource": "prometheus-istio-aks",
           "fieldConfig": {
             "defaults": {
               "custom": {}
@@ -1923,7 +1923,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "",
+          "datasource": "prometheus-istio-aks",
           "fieldConfig": {
             "defaults": {
               "custom": {}
@@ -2030,7 +2030,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "",
+          "datasource": "prometheus-istio-aks",
           "fieldConfig": {
             "defaults": {
               "custom": {}
@@ -2137,7 +2137,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "",
+          "datasource": "prometheus-istio-aks",
           "description": "",
           "fieldConfig": {
             "defaults": {
@@ -2301,7 +2301,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "",
+          "datasource": "prometheus-istio-aks",
           "fieldConfig": {
             "defaults": {
               "custom": {}
@@ -2463,7 +2463,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "",
+          "datasource": "prometheus-istio-aks",
           "fieldConfig": {
             "defaults": {
               "custom": {}
@@ -2625,7 +2625,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "",
+          "datasource": "prometheus-istio-aks",
           "fieldConfig": {
             "defaults": {
               "custom": {}
@@ -2729,7 +2729,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "",
+          "datasource": "prometheus-istio-aks",
           "fieldConfig": {
             "defaults": {
               "custom": {}
@@ -2860,7 +2860,7 @@
       {
         "allValue": null,
         "current": {},
-        "datasource": "",
+        "datasource": "prometheus-istio-aks",
         "definition": "",
         "hide": 0,
         "includeAll": false,
@@ -2868,9 +2868,9 @@
         "multi": false,
         "name": "service",
         "options": [],
-        "query": "query_result(sum(istio_requests_total{}) by (destination_service) or sum(istio_tcp_sent_bytes_total{}) by (destination_service))",
+        "query": "label_values(destination_service)",
         "refresh": 1,
-        "regex": "/.*destination_service=\"([^\"]*).*/",
+        "regex": "",
         "skipUrlSync": false,
         "sort": 0,
         "tagValuesQuery": "",
@@ -2886,14 +2886,15 @@
           "text": "destination",
           "value": "destination"
         },
-        "datasource": "",
+        "datasource": "prometheus-istio-aks",
         "definition": "",
         "hide": 0,
         "includeAll": false,
         "label": "Reporter",
         "multi": true,
         "name": "qrep",
-        "query": "source,destination",
+        "options": [],
+        "query": "label_values(reporter)",
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
@@ -2901,13 +2902,13 @@
         "tagValuesQuery": "",
         "tags": [],
         "tagsQuery": "",
-        "type": "custom",
+        "type": "query",
         "useTags": false
       },
       {
         "allValue": null,
         "current": {},
-        "datasource": "",
+        "datasource": "prometheus-istio-aks",
         "definition": "",
         "hide": 0,
         "includeAll": true,
@@ -2929,7 +2930,7 @@
       {
         "allValue": null,
         "current": {},
-        "datasource": "",
+        "datasource": "prometheus-istio-aks",
         "definition": "",
         "hide": 0,
         "includeAll": true,
@@ -2951,7 +2952,7 @@
       {
         "allValue": null,
         "current": {},
-        "datasource": "",
+        "datasource": "prometheus-istio-aks",
         "definition": "",
         "hide": 0,
         "includeAll": true,
@@ -2973,7 +2974,7 @@
       {
         "allValue": null,
         "current": {},
-        "datasource": "",
+        "datasource": "prometheus-istio-aks",
         "definition": "",
         "hide": 0,
         "includeAll": true,
@@ -2995,7 +2996,7 @@
       {
         "allValue": null,
         "current": {},
-        "datasource": "",
+        "datasource": "prometheus-istio-aks",
         "definition": "",
         "hide": 0,
         "includeAll": true,
@@ -3017,7 +3018,7 @@
       {
         "allValue": null,
         "current": {},
-        "datasource": "",
+        "datasource": "prometheus-istio-aks",
         "definition": "",
         "hide": 0,
         "includeAll": true,

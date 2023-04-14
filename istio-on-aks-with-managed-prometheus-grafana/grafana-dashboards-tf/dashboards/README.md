@@ -14,6 +14,5 @@ Run:
 for id in 7645 7639 7636 7630 13277 ; do curl -s https://grafana.com/api/dashboards/${id}/revisions/latest/download | jq . > ${id}.json ; done
 
 # Fix the json https://github.com/grafana/grafana/issues/10786#issuecomment-1277000930
-sed -i  's/${DS_PROMETHEUS}//g' *.json # on MacOS use gsed
-sed -i  's/DS_PROMETHEUS//g' *.json
+sed -i  's/${DS_PROMETHEUS}/prometheus-istio-aks/g' *.json # on MacOS use gsed
 ```
