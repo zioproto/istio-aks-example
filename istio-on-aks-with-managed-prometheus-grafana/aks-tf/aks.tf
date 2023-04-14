@@ -10,7 +10,7 @@ module "aks" {
   network_plugin                    = "azure"
   vnet_subnet_id                    = module.network.vnet_subnets[0]
   os_disk_size_gb                   = 50
-  sku_tier                          = "Paid" # defaults to Free
+  sku_tier                          = "Standard"
   private_cluster_enabled           = false
   http_application_routing_enabled  = false
   enable_auto_scaling               = true

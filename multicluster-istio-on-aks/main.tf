@@ -6,7 +6,7 @@ resource "random_string" "random" {
 
 module "aks-westeurope" {
   source                            = "Azure/aks/azurerm"
-  version                           = "6.5.0"
+  version                           = "6.8.0"
   resource_group_name               = azurerm_resource_group.westeurope.name
   kubernetes_version                = var.kubernetes_version
   orchestrator_version              = var.kubernetes_version
@@ -14,7 +14,7 @@ module "aks-westeurope" {
   network_plugin                    = "azure"
   vnet_subnet_id                    = module.network-westeurope.vnet_subnets[0]
   os_disk_size_gb                   = 50
-  sku_tier                          = "Paid" # defaults to Free
+  sku_tier                          = "Standard"
   role_based_access_control_enabled = true
   rbac_aad_admin_group_object_ids   = var.rbac_aad_admin_group_object_ids
   rbac_aad_managed                  = true
@@ -59,7 +59,7 @@ module "aks-westeurope" {
 
 module "aks-eastus" {
   source                            = "Azure/aks/azurerm"
-  version                           = "6.5.0"
+  version                           = "6.8.0"
   resource_group_name               = azurerm_resource_group.eastus.name
   kubernetes_version                = var.kubernetes_version
   orchestrator_version              = var.kubernetes_version
@@ -67,7 +67,7 @@ module "aks-eastus" {
   network_plugin                    = "azure"
   vnet_subnet_id                    = module.network-eastus.vnet_subnets[0]
   os_disk_size_gb                   = 50
-  sku_tier                          = "Paid" # defaults to Free
+  sku_tier                          = "Standard"
   role_based_access_control_enabled = true
   rbac_aad_admin_group_object_ids   = var.rbac_aad_admin_group_object_ids
   rbac_aad_managed                  = true

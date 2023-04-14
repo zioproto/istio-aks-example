@@ -1,6 +1,6 @@
 module "aks" {
   source                           = "Azure/aks/azurerm"
-  version                          = "6.7.1"
+  version                          = "6.8.0"
   resource_group_name              = azurerm_resource_group.this.name
   kubernetes_version               = var.kubernetes_version
   orchestrator_version             = var.kubernetes_version
@@ -8,7 +8,8 @@ module "aks" {
   network_plugin                   = "azure"
   vnet_subnet_id                   = lookup(module.network.vnet_subnets_name_id, "system")
   os_disk_size_gb                  = 50
-  sku_tier                         = "Paid" # defaults to Free
+  sku_tier                         = "Standard"
+  rbac_aad_admin_group_object_ids  = var.rbac_aad_admin_group_object_ids
   private_cluster_enabled          = false
   http_application_routing_enabled = false
   enable_auto_scaling              = true

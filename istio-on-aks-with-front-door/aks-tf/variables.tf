@@ -14,3 +14,9 @@ variable "kubernetes_version" {
   type        = string
   default     = null
 }
+
+variable "rbac_aad_admin_group_object_ids" {
+  description = "Object ID of Active Directory groups with admin access."
+  type        = list(string)
+  default     = null
+}
