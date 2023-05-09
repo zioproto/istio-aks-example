@@ -265,7 +265,7 @@ At this point, we should be able to connect to our Front Door endpoint and see t
 
 Check if you can reach the echoserver pod:
 ```
-curl -v $(az afd endpoint list -g istio-aks --profile-name MyFrontDoor -o json | jq -r ".[0].hostName")
+curl -v https://$(az afd endpoint list -g istio-aks --profile-name MyFrontDoor -o json | jq -r ".[0].hostName")
 ```
 
 To get more information on how to write a `VirtualService` resource the source of truth is the API docs:
