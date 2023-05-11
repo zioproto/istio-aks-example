@@ -311,7 +311,7 @@ tcpdump -i eth0 -n -c 15 -X port 8080
 ```
 ## Observability
 
-The file [prometheus.tf](prometheus.tf) installs the Helm community chart for
+The file [prometheus.tf](istio-tf/prometheus.tf) installs the Helm community chart for
 Prometheus and Grafana, and creates the configuration to scrape the Istio
 sidecars.
 
