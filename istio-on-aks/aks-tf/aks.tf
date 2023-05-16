@@ -10,7 +10,7 @@ module "aks" {
   os_disk_size_gb                   = 50
   sku_tier                          = "Standard"
   role_based_access_control_enabled = true
-  rbac_aad_admin_group_object_ids   = var.rbac_aad_admin_group_object_ids
+  rbac_aad                          = false
   private_cluster_enabled           = false
   http_application_routing_enabled  = false
   enable_auto_scaling               = true
