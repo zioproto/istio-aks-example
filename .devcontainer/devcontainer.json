@@ -1,0 +1,21 @@
+{
+    "name": "Terraform and Azure CLI 2.0",
+
+    "extensions": [
+        "ms-azuretools.vscode-azureterraform",
+        "hashicorp.terraform",
+        "github.vscode-pull-request-github",
+        "ms-azuretools.vscode-docker",
+        "ms-vscode.azure-account",
+        "ms-vscode.azurecli"
+    ],
+
+	"features": {
+		"azure-cli": "latest",
+        "terraform": {
+            "version": "latest",
+            "tflint": "latest",
+            "terragrunt": "latest"
+        }
+	},
+}
