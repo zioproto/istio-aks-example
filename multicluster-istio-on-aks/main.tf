@@ -6,7 +6,7 @@ resource "random_string" "random" {
 
 module "aks-westeurope" {
   source                            = "Azure/aks/azurerm"
-  version                           = "6.8.0"
+  version                           = "7.2.0"
   resource_group_name               = azurerm_resource_group.westeurope.name
   kubernetes_version                = var.kubernetes_version
   orchestrator_version              = var.kubernetes_version
@@ -45,21 +45,22 @@ module "aks-westeurope" {
   ingress_application_gateway_name      = "aks-agw-westeurope"
   ingress_application_gateway_subnet_id = module.network-westeurope.vnet_subnets[2]
 
-  network_policy                 = "azure"
-  net_profile_dns_service_ip     = "10.0.0.10"
-  net_profile_docker_bridge_cidr = "172.17.0.1/16"
-  net_profile_service_cidr       = "10.0.0.0/16"
+  network_policy             = "azure"
+  net_profile_dns_service_ip = "10.0.0.10"
+  net_profile_service_cidr   = "10.0.0.0/16"
 
   key_vault_secrets_provider_enabled = true
   secret_rotation_enabled            = true
   secret_rotation_interval           = "3m"
+
+  node_pools = local.node_pools_west
 
   depends_on = [module.network-westeurope]
 }
 
 module "aks-eastus" {
   source                            = "Azure/aks/azurerm"
-  version                           = "6.8.0"
+  version                           = "7.2.0"
   resource_group_name               = azurerm_resource_group.eastus.name
   kubernetes_version                = var.kubernetes_version
   orchestrator_version              = var.kubernetes_version
@@ -98,14 +99,15 @@ module "aks-eastus" {
   ingress_application_gateway_name      = "aks-agw-eastus"
   ingress_application_gateway_subnet_id = module.network-eastus.vnet_subnets[2]
 
-  network_policy                 = "azure"
-  net_profile_dns_service_ip     = "10.1.0.10"
-  net_profile_docker_bridge_cidr = "172.17.0.1/16"
-  net_profile_service_cidr       = "10.1.0.0/16"
+  network_policy             = "azure"
+  net_profile_dns_service_ip = "10.1.0.10"
+  net_profile_service_cidr   = "10.1.0.0/16"
 
   key_vault_secrets_provider_enabled = true
   secret_rotation_enabled            = true
   secret_rotation_interval           = "3m"
+
+  node_pools = local.node_pools_east
 
   depends_on = [module.network-eastus]
 }
