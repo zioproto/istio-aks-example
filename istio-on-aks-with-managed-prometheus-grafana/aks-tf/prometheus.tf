@@ -1,80 +1,58 @@
 # https://medium.com/microsoftazure/deploying-azure-managed-prometheus-with-azapi-ef17e15acac8
 
 # azure monitor workspace for prometheus
-resource "azapi_resource" "prometheus" {
-  type      = "microsoft.monitor/accounts@2021-06-03-preview"
-  name      = "prometheus-istio-aks"
-  parent_id = azurerm_resource_group.this.id
-  location  = azurerm_resource_group.this.location
-
-  response_export_values = ["*"]
+resource azurerm_monitor_workspace prometheus {
+  name                = "prometheus-istio-aks"
+  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.this.name
 }
 
-# data collection endpoint
-resource "azapi_resource" "dataCollectionEndpoint" {
-  type      = "Microsoft.Insights/dataCollectionEndpoints@2021-09-01-preview"
-  name      = "MSProm-EUS-istio-aks"
-  parent_id = azurerm_resource_group.this.id
-  location  = azurerm_resource_group.this.location
-
-  body = jsonencode({
-    kind       = "Linux"
-    properties = {}
-  })
+# data collection endpoint for prometheus
+resource "azurerm_monitor_data_collection_endpoint" "dataCollectionEndpoint" {
+  name                = "MSProm-EUS-istio-aks"
+  resource_group_name = azurerm_resource_group.this.name
+  location            = azurerm_resource_group.this.location
+  kind                = "Linux"
 }
 
-resource "azapi_resource" "dataCollectionRule" {
-  schema_validation_enabled = false
-
-  type      = "Microsoft.Insights/dataCollectionRules@2021-09-01-preview"
+resource "azurerm_monitor_data_collection_rule" "dataCollectionRule" {
   name      = "MSProm-EUS-istio-aks"
-  parent_id = azurerm_resource_group.this.id
-  location  = azurerm_resource_group.this.location
-
-  body = jsonencode({
-    kind = "Linux"
-    properties = {
-      dataCollectionEndpointId = azapi_resource.dataCollectionEndpoint.id
-      dataFlows = [
-        {
-          destinations = ["MonitoringAccount1"]
-          streams      = ["Microsoft-PrometheusMetrics"]
-        }
-      ]
-      dataSources = {
-        prometheusForwarder = [
-          {
-            name               = "PrometheusDataSource"
-            streams            = ["Microsoft-PrometheusMetrics"]
-            labelIncludeFilter = {}
-          }
-        ]
-      }
-      destinations = {
-        monitoringAccounts = [
-          {
-            accountResourceId = azapi_resource.prometheus.id
-            name              = "MonitoringAccount1"
-          }
-        ]
-      }
+  resource_group_name         = azurerm_resource_group.this.name
+  location                    = azurerm_resource_group.this.location
+  data_collection_endpoint_id = azurerm_monitor_data_collection_endpoint.dataCollectionEndpoint.id
+  kind                        = "Linux"
+  destinations {
+    monitor_account {
+      monitor_account_id = azurerm_monitor_workspace.prometheus.id
+      name               = "MonitoringAccount1"
     }
-  })
+  }
+  data_flow {
+    streams      = ["Microsoft-PrometheusMetrics"]
+    destinations = ["MonitoringAccount1"]
+  }
+  data_sources {
+    prometheus_forwarder {
+      streams = ["Microsoft-PrometheusMetrics"]
+      name    = "PrometheusDataSource"
+    }
+  }
+  description = "DCR for Azure Monitor Metrics Profile (Managed Prometheus)"
+  depends_on = [
+    azurerm_monitor_data_collection_endpoint.dataCollectionEndpoint
+  ]
 }
 
 # associate our AKS cluster with this Azure Monitor workspace using the Data Collection Endpoint and Rule
-resource "azapi_resource" "dataCollectionRuleAssociation" {
-  schema_validation_enabled = false
-  type                      = "Microsoft.Insights/dataCollectionRuleAssociations@2021-09-01-preview"
-  name                      = "MSProm-EUS-istio-aks"
-  parent_id                 = module.aks.aks_id
 
-  body = jsonencode({
-    scope = module.aks.aks_id
-    properties = {
-      dataCollectionRuleId = azapi_resource.dataCollectionRule.id
-    }
-  })
+resource "azurerm_monitor_data_collection_rule_association" "dataCollectionRuleAssociation" {
+  name                   = "MSProm-EUS-istio-aks"
+  target_resource_id      = module.aks.aks_id
+  data_collection_rule_id = azurerm_monitor_data_collection_rule.dataCollectionRule.id
+  description             = "Association of data collection rule. Deleting this association will break the data collection for this AKS Cluster."
+  depends_on = [
+    azurerm_monitor_data_collection_rule.dataCollectionRule
+  ]
 }
 
 resource "azurerm_dashboard_grafana" "this" {
@@ -86,7 +64,7 @@ resource "azurerm_dashboard_grafana" "this" {
   public_network_access_enabled     = true
 
   azure_monitor_workspace_integrations {
-    resource_id = azapi_resource.prometheus.id
+    resource_id = azurerm_monitor_workspace.prometheus.id
   }
 
   identity {
