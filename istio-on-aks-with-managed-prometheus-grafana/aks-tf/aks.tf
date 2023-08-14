@@ -1,7 +1,8 @@
 module "aks" {
   source                            = "Azure/aks/azurerm"
-  version                           = "6.8.0"
+  version                           = "7.3.0"
   resource_group_name               = azurerm_resource_group.this.name
+  location                          = var.region
   kubernetes_version                = var.kubernetes_version
   orchestrator_version              = var.kubernetes_version
   role_based_access_control_enabled = true
@@ -38,12 +39,19 @@ module "aks" {
 
   network_policy                 = "azure"
   net_profile_dns_service_ip     = "10.0.0.10"
-  net_profile_docker_bridge_cidr = "172.17.0.1/16"
   net_profile_service_cidr       = "10.0.0.0/16"
 
   key_vault_secrets_provider_enabled = true
   secret_rotation_enabled            = true
   secret_rotation_interval           = "3m"
+
+  node_pools = local.node_pools
+
+  storage_profile_enabled = true
+  storage_profile_blob_driver_enabled = true
+
+  network_contributor_role_assigned_subnet_ids =  { "system" = module.network.vnet_subnets[0]}
+
 
   depends_on = [module.network]
 }
