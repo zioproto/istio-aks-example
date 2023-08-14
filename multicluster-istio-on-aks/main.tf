@@ -6,7 +6,7 @@ resource "random_string" "random" {
 
 module "aks-westeurope" {
   source                            = "Azure/aks/azurerm"
-  version                           = "7.2.0"
+  version                           = "7.3.0"
   resource_group_name               = azurerm_resource_group.westeurope.name
   kubernetes_version                = var.kubernetes_version
   orchestrator_version              = var.kubernetes_version
@@ -16,8 +16,7 @@ module "aks-westeurope" {
   os_disk_size_gb                   = 50
   sku_tier                          = "Standard"
   role_based_access_control_enabled = true
-  rbac_aad_admin_group_object_ids   = var.rbac_aad_admin_group_object_ids
-  rbac_aad_managed                  = true
+  rbac_aad                          = false
   private_cluster_enabled           = false
   http_application_routing_enabled  = false
   azure_policy_enabled              = true
@@ -41,9 +40,7 @@ module "aks-westeurope" {
     "Agent" : "defaultnodepoolagent"
   }
 
-  ingress_application_gateway_enabled   = true
-  ingress_application_gateway_name      = "aks-agw-westeurope"
-  ingress_application_gateway_subnet_id = module.network-westeurope.vnet_subnets[2]
+  ingress_application_gateway_enabled   = false
 
   network_policy             = "azure"
   net_profile_dns_service_ip = "10.0.0.10"
@@ -60,7 +57,7 @@ module "aks-westeurope" {
 
 module "aks-eastus" {
   source                            = "Azure/aks/azurerm"
-  version                           = "7.2.0"
+  version                           = "7.3.0"
   resource_group_name               = azurerm_resource_group.eastus.name
   kubernetes_version                = var.kubernetes_version
   orchestrator_version              = var.kubernetes_version
@@ -70,8 +67,7 @@ module "aks-eastus" {
   os_disk_size_gb                   = 50
   sku_tier                          = "Standard"
   role_based_access_control_enabled = true
-  rbac_aad_admin_group_object_ids   = var.rbac_aad_admin_group_object_ids
-  rbac_aad_managed                  = true
+  rbac_aad                          = false
   private_cluster_enabled           = false
   http_application_routing_enabled  = false
   azure_policy_enabled              = true
@@ -95,9 +91,7 @@ module "aks-eastus" {
     "Agent" : "defaultnodepoolagent"
   }
 
-  ingress_application_gateway_enabled   = true
-  ingress_application_gateway_name      = "aks-agw-eastus"
-  ingress_application_gateway_subnet_id = module.network-eastus.vnet_subnets[2]
+  ingress_application_gateway_enabled   = false
 
   network_policy             = "azure"
   net_profile_dns_service_ip = "10.1.0.10"
