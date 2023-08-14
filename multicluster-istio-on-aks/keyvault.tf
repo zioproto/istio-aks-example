@@ -67,12 +67,32 @@ resource "azurerm_key_vault" "this" {
     tenant_id = data.azurerm_client_config.current.tenant_id
     object_id = module.aks-westeurope.key_vault_secrets_provider.secret_identity[0].object_id
 
-    key_permissions = [
-      "Get",
-    ]
-
     secret_permissions = [
       "Get",
+      "List",
+      "Set",
+      "Delete",
+      "Recover",
+      "Backup",
+      "Restore",
+      "Purge"
+
+    ]
+    key_permissions = [
+      "Get",
+      "List",
+      "Update",
+      "Create",
+      "Import",
+      "Delete",
+      "Recover",
+      "Backup",
+      "Restore",
+      "Purge",
+      "Encrypt",
+      "Decrypt",
+      "Sign",
+      "Verify"
     ]
 
     certificate_permissions = [
@@ -84,12 +104,32 @@ resource "azurerm_key_vault" "this" {
     tenant_id = data.azurerm_client_config.current.tenant_id
     object_id = module.aks-eastus.key_vault_secrets_provider.secret_identity[0].object_id
 
-    key_permissions = [
-      "Get",
-    ]
-
     secret_permissions = [
       "Get",
+      "List",
+      "Set",
+      "Delete",
+      "Recover",
+      "Backup",
+      "Restore",
+      "Purge"
+
+    ]
+    key_permissions = [
+      "Get",
+      "List",
+      "Update",
+      "Create",
+      "Import",
+      "Delete",
+      "Recover",
+      "Backup",
+      "Restore",
+      "Purge",
+      "Encrypt",
+      "Decrypt",
+      "Sign",
+      "Verify"
     ]
 
     certificate_permissions = [
