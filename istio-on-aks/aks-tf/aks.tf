@@ -1,12 +1,12 @@
 module "aks" {
   source                            = "Azure/aks/azurerm"
-  version                           = "6.8.0"
+  version                           = "7.3.0"
   resource_group_name               = azurerm_resource_group.this.name
   kubernetes_version                = var.kubernetes_version
   orchestrator_version              = var.kubernetes_version
   prefix                            = "istio"
   network_plugin                    = "azure"
-  vnet_subnet_id                    = module.network.vnet_subnets[0]
+  vnet_subnet_id                    = data.azurerm_subnet.system.id
   os_disk_size_gb                   = 50
   sku_tier                          = "Standard"
   role_based_access_control_enabled = true
@@ -35,14 +35,18 @@ module "aks" {
 
   ingress_application_gateway_enabled = false
 
-  network_policy                 = "azure"
-  net_profile_dns_service_ip     = "10.0.0.10"
-  net_profile_docker_bridge_cidr = "172.17.0.1/16"
-  net_profile_service_cidr       = "10.0.0.0/16"
+  network_policy             = "azure"
+  net_profile_dns_service_ip = "10.0.0.10"
+  net_profile_service_cidr   = "10.0.0.0/16"
 
   key_vault_secrets_provider_enabled = true
   secret_rotation_enabled            = true
   secret_rotation_interval           = "3m"
+
+  workload_identity_enabled = true
+  oidc_issuer_enabled       = true
+
+  node_pools = local.node_pools
 
   depends_on = [module.network]
 }
