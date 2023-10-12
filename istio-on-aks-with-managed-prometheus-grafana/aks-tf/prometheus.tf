@@ -55,8 +55,13 @@ resource "azurerm_monitor_data_collection_rule_association" "dataCollectionRuleA
   ]
 }
 
+# Random suffix for the grafa dashboard name
+resource "random_id" "grafana" {
+  byte_length = 6
+}
+
 resource "azurerm_dashboard_grafana" "this" {
-  name                              = "istio-grafana"
+  name                              = "grafana-${random_id.grafana.hex}"
   resource_group_name               = azurerm_resource_group.this.name
   location                          = azurerm_resource_group.this.location
   api_key_enabled                   = true

@@ -41,12 +41,13 @@ terraform init -upgrade
 terraform apply -var-file=.tfvars
 # Deploy the additional Grafana Dashboards
 cd ../grafana-dashboards-tf
-export TF_VAR_url=$(az grafana show -g istio-aks -n istio-grafana -o json | jq -r .properties.endpoint)
-export TF_VAR_token=$(az grafana api-key create --key `date +%s` --name istio-grafana -g istio-aks -r editor --time-to-live 4m -o json | jq -r .key)
+export GRAFANA_NAME=$(az grafana list -g istio-aks -o json | jq -r '.[0].name')
+export TF_VAR_url=$(az grafana show -g istio-aks -n $GRAFANA_NAME -o json | jq -r .properties.endpoint)
+export TF_VAR_token=$(az grafana api-key create --key `date +%s` --name $GRAFANA_NAME -g istio-aks -r editor --time-to-live 4m -o json | jq -r .key)
 terraform apply
 # Install Istio
 cd ../istio-tf
-az aks get-credentials --resource-group istio-aks --name istio-aks
+az aks get-credentials --resource-group istio-aks --name istio-aks --overwrite-existing
 terraform init -upgrade
 terraform apply
 ```
