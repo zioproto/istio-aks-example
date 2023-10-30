@@ -12,7 +12,6 @@ data "azurerm_resource_group" "node_rg" {
 # https://learn.microsoft.com/en-us/azure/application-gateway/for-containers/quickstart-deploy-application-gateway-for-containers-alb-controller?tabs=install-helm-windows
 resource "azurerm_role_assignment" "alb_controller" {
   scope = data.azurerm_resource_group.node_rg.id
-  #role_definition_id = "acdd72a7-3385-48ef-bd42-f606fba81ae7"
   role_definition_name = "Reader"
   principal_id         = azurerm_user_assigned_identity.alb_controller.principal_id
 }
@@ -32,8 +31,7 @@ resource "azurerm_federated_identity_credential" "alb_controller" {
 
 resource "azurerm_role_assignment" "containers_configuration_manager" {
   scope = data.azurerm_resource_group.node_rg.id
-  #role_definition_name = "Containers Configuration Manager"
-  role_definition_id = "/providers/Microsoft.Authorization/roleDefinitions/fbc52c3f-28ad-4303-a892-8a056630b8f1"
+  role_definition_name = "AppGw for Containers Configuration Manager"
   principal_id       = azurerm_user_assigned_identity.alb_controller.principal_id
   depends_on         = [module.aks]
 }

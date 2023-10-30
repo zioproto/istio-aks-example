@@ -10,10 +10,13 @@ module "network" {
   subnet_delegation = {
     subnet-alb = [
       {
-      name    = "delegation"
-      service_delegation = {
-        name = "Microsoft.ServiceNetworking/trafficControllers"
-      }
+        name = "delegation"
+        service_delegation = {
+          name = "Microsoft.ServiceNetworking/trafficControllers"
+          actions = [
+            "Microsoft.Network/virtualNetworks/subnets/join/action",
+          ]
+        }
       }
     ]
   }

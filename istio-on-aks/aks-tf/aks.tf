@@ -15,7 +15,7 @@ module "aks" {
   http_application_routing_enabled  = false
   enable_auto_scaling               = true
   enable_host_encryption            = false
-  log_analytics_workspace_enabled   = false
+  log_analytics_workspace_enabled   = true
   agents_min_count                  = 1
   agents_max_count                  = 5
   agents_count                      = null # Please set `agents_count` `null` while `enable_auto_scaling` is `true` to avoid possible `agents_count` changes.
