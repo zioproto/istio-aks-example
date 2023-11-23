@@ -6,7 +6,7 @@ resource "random_string" "random" {
 
 module "aks-westeurope" {
   source                            = "Azure/aks/azurerm"
-  version                           = "7.3.0"
+  version                           = "7.5.0"
   resource_group_name               = azurerm_resource_group.westeurope.name
   kubernetes_version                = var.kubernetes_version
   orchestrator_version              = var.kubernetes_version
@@ -40,7 +40,15 @@ module "aks-westeurope" {
     "Agent" : "defaultnodepoolagent"
   }
 
-  ingress_application_gateway_enabled   = false
+  ingress_application_gateway_enabled   = true
+  ingress_application_gateway_name      = "aks-agw-westeurope"
+  ingress_application_gateway_subnet_id = module.network-westeurope.vnet_subnets[2]
+
+  # Use this block to create a new Application Gateway when you will upgrade the module to 8.0.0
+  #green_field_application_gateway_for_ingress = {
+  #  name      = "aks-agw-westeurope"
+  #  subnet_id = module.network-westeurope.vnet_subnets[2]
+  #}
 
   network_policy             = "azure"
   net_profile_dns_service_ip = "10.0.0.10"
@@ -57,7 +65,7 @@ module "aks-westeurope" {
 
 module "aks-eastus" {
   source                            = "Azure/aks/azurerm"
-  version                           = "7.3.0"
+  version                           = "7.5.0"
   resource_group_name               = azurerm_resource_group.eastus.name
   kubernetes_version                = var.kubernetes_version
   orchestrator_version              = var.kubernetes_version
@@ -91,7 +99,7 @@ module "aks-eastus" {
     "Agent" : "defaultnodepoolagent"
   }
 
-  ingress_application_gateway_enabled   = false
+  ingress_application_gateway_enabled = false
 
   network_policy             = "azure"
   net_profile_dns_service_ip = "10.1.0.10"
