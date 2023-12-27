@@ -285,13 +285,13 @@ az role assignment create --role "Managed Identity Operator" --assignee $agicIde
 # One time operation, assign the identity to Application Gateway
 az network application-gateway identity assign \
                               --gateway-name aks-agw-westeurope \
-                              --resource-group istio-aks-westeurope \
+                              --resource-group $aksResourceGroupName \
                               --identity $identityID
 
 # One time operation, assign the identity GET secret access to Azure Key Vault
 az keyvault set-policy \
             -n $keyvaultname \
-            -g istio-aks-westeurope \
+            -g keyvault-rg \
             --object-id $identityPrincipal \
             --secret-permissions get
 
@@ -341,13 +341,13 @@ We need to create a `SecretProviderClass` in the `istio-ingress` namespace to re
 ```
 terraform output -raw secret-provider-class-ingress | kubectl --context=westeurope-aks -n istio-ingress apply -f -
 
-cd cd istio-installation
+cd istio-installation
 
 istioctl install -y \
   --context=westeurope-aks \
   --set profile=minimal \
-  --revision=1-15-1 \
-  --set tag=1.15.1 \
+  --revision=1-20-1 \
+  --set tag=1.20.1 \
   -f 001-accessLogFile.yaml \
   -f 002-multicluster-westeurope.yaml \
   -f 003-istiod-csi-secrets.yaml \
