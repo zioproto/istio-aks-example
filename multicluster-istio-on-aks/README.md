@@ -194,14 +194,14 @@ We are now going to expose the `istio-ingressgateway` on 1 AKS cluster, you can 
 Lets configure the ingress and the gateway:
 
 ```
-kubectl apply -f istio-installation/gateway.yaml
-kubectl apply -f istio-installation/ingress.yaml
+kubectl apply  --context=westeurope-aks -f istio-installation/gateway.yaml
+kubectl apply  --context=westeurope-aks -f istio-installation/ingress.yaml
 ```
 
 Now you can reach the envoy of the `istio-ingressgateway` and you will get a HTTP 404:
 
 ```
-curl -v $(kubectl get ingress -n istio-ingress istio-ingress-application-gateway -o json | jq -r '.status.loadBalancer.ingress[0].ip')
+curl -v $(kubectl get ingress --context=westeurope-aks -n istio-ingress istio-ingress-application-gateway -o json | jq -r '.status.loadBalancer.ingress[0].ip')
 *   Trying x.x.x.x:80...
 * Connected to x.x.x.x (x.x.x.x) port 80 (#0)
 > GET / HTTP/1.1
@@ -222,13 +222,13 @@ curl -v $(kubectl get ingress -n istio-ingress istio-ingress-application-gateway
 To actually reach the echoserver create the `VirtualService`
 
 ```
- cat istio-installation/virtualservice.yaml | sed -e "s/x.x.x.x/$(kubectl get ingress -n istio-ingress istio-ingress-application-gateway -o json | jq -r '.status.loadBalancer.ingress[0].ip')/" | kubectl apply -f -
+ cat istio-installation/virtualservice.yaml | sed -e "s/x.x.x.x/$(kubectl get ingress --context=westeurope-aks -n istio-ingress istio-ingress-application-gateway -o json | jq -r '.status.loadBalancer.ingress[0].ip')/" | kubectl apply --context=westeurope-aks -f -
 ```
 
 Now you have to use the hostname to `curl`:
 
 ```
-curl -v $(kubectl get ingress -n istio-ingress istio-ingress-application-gateway -o json | jq -r '.status.loadBalancer.ingress[0].ip').nip.io
+curl -v $(kubectl get ingress --context=westeurope-aks -n istio-ingress istio-ingress-application-gateway -o json | jq -r '.status.loadBalancer.ingress[0].ip').nip.io
 ```
 
 In the above command we leverage the [nip.io](https://nip.io/) free service that makes it easy to quickly have a DNS name for any IP address for troubleshooting and testing.

@@ -5,8 +5,9 @@ resource "random_string" "random" {
 }
 
 module "aks-westeurope" {
-  source                            = "Azure/aks/azurerm"
-  version                           = "7.5.0"
+  source                            = "github.com/Azure/terraform-azurerm-aks.git?ref=2fdde3c4d1079ce7f8119f3caccc59d9d7d117a1"
+  #source                            = "Azure/aks/azurerm"
+  #version                           = "8.0.0"
   resource_group_name               = azurerm_resource_group.westeurope.name
   kubernetes_version                = var.kubernetes_version
   orchestrator_version              = var.kubernetes_version
@@ -18,7 +19,6 @@ module "aks-westeurope" {
   role_based_access_control_enabled = true
   rbac_aad                          = false
   private_cluster_enabled           = false
-  http_application_routing_enabled  = false
   azure_policy_enabled              = true
   enable_auto_scaling               = true
   enable_host_encryption            = false
@@ -40,15 +40,10 @@ module "aks-westeurope" {
     "Agent" : "defaultnodepoolagent"
   }
 
-  ingress_application_gateway_enabled   = true
-  ingress_application_gateway_name      = "aks-agw-westeurope"
-  ingress_application_gateway_subnet_id = module.network-westeurope.vnet_subnets[2]
-
-  # Use this block to create a new Application Gateway when you will upgrade the module to 8.0.0
-  #green_field_application_gateway_for_ingress = {
-  #  name      = "aks-agw-westeurope"
-  #  subnet_id = module.network-westeurope.vnet_subnets[2]
-  #}
+  green_field_application_gateway_for_ingress = {
+    name      = "aks-agw-westeurope"
+    subnet_id = module.network-westeurope.vnet_subnets[2]
+  }
 
   network_policy             = "azure"
   net_profile_dns_service_ip = "10.0.0.10"
