@@ -19,6 +19,9 @@ locals {
       min_count             = 1
       max_count             = 2
       vnet_subnet_id        = data.azurerm_subnet.system.id
+      node_labels = {
+        "nodepoolname" = "ingress"
+      }
     }
   }
 }

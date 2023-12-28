@@ -1,6 +1,7 @@
 module "aks" {
-  source                            = "Azure/aks/azurerm"
-  version                           = "7.3.0"
+  source = "github.com/Azure/terraform-azurerm-aks.git?ref=2fdde3c4d1079ce7f8119f3caccc59d9d7d117a1"
+  #source                            = "Azure/aks/azurerm"
+  #version                           = "8.0.0"
   resource_group_name               = azurerm_resource_group.this.name
   kubernetes_version                = var.kubernetes_version
   orchestrator_version              = var.kubernetes_version
@@ -12,7 +13,6 @@ module "aks" {
   role_based_access_control_enabled = true
   rbac_aad                          = false
   private_cluster_enabled           = false
-  http_application_routing_enabled  = false
   enable_auto_scaling               = true
   enable_host_encryption            = false
   log_analytics_workspace_enabled   = true
@@ -32,8 +32,6 @@ module "aks" {
   agents_tags = {
     "Agent" : "defaultnodepoolagent"
   }
-
-  ingress_application_gateway_enabled = false
 
   network_policy             = "azure"
   net_profile_dns_service_ip = "10.0.0.10"

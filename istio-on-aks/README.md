@@ -32,7 +32,7 @@ cp tfvars .tfvars #customize anything
 terraform init -upgrade
 terraform apply -var-file=.tfvars
 cd ../istio-tf
-az aks get-credentials --resource-group istio-aks --name istio-aks
+az aks get-credentials --resource-group istio-aks --name istio-aks --overwrite-existing
 terraform init -upgrade
 terraform apply
 ```
@@ -48,7 +48,7 @@ To interact with the control plane you will need a tool called `istioctl`.
 You can install it like this:
 
 ```
-curl -sL https://istio.io/downloadIstioctl | ISTIO_VERSION=1.18.2 sh -
+curl -sL https://istio.io/downloadIstioctl | ISTIO_VERSION=1.20.1 sh -
 export PATH=$HOME/.istioctl/bin:$PATH
 ```
 
@@ -56,7 +56,7 @@ You will of course need `kubectl` and you can get credentials for the cluster
 with the command:
 
 ```
-az aks get-credentials --resource-group istio-aks --name istio-aks
+az aks get-credentials --resource-group istio-aks --name istio-aks --overwrite-existing
 ```
 
 ## Injecting the sidecar

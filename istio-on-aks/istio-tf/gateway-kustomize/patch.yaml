@@ -11,7 +11,7 @@ spec:
           preferredDuringSchedulingIgnoredDuringExecution:
           - preference:
               matchExpressions:
-              - key: agentpool
+              - key: nodepoolname
                 operator: In
                 values:
                 - ingress

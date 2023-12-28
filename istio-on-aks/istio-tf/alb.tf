@@ -12,7 +12,7 @@ resource "helm_release" "alb-controller" {
   namespace        = "azure-alb-system"
   create_namespace = "true"
   name             = "alb-controller"
-  version          = "0.5.024542"
+  version          = "0.6.3"
   repository       = "oci://mcr.microsoft.com/application-lb/charts/"
   atomic           = "true"
   values = [
