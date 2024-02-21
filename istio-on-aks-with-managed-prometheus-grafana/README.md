@@ -332,7 +332,7 @@ Azure Managed Grafana.
 Access the Grafana dashboard:
 
 ```
-az grafana show -g istio-aks --name istio-grafana -o json | jq .properties.endpoint
+az grafana list -g istio-aks -o json | jq '.[0].properties.endpoint'
 ```
 And point your browser to the URL displayed by this command.
 
