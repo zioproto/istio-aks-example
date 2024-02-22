@@ -1,4 +1,3 @@
-
 resource "helm_release" "istio-base" {
   chart            = "base"
   namespace        = "istio-system"
