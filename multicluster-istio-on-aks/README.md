@@ -84,10 +84,10 @@ done
 
 > If the `az keyvault certificate import` step fails complaining about the PEM format, try the workaround published here: https://github.com/Azure/azure-cli/issues/8099#issuecomment-795180979
 
-# Create the ServiceProviderClass
+# Create the SecretProviderClass
 
-Now we create the Service Provider Class that will allow us to consume secrets from the Azure Key Vault.
-The Service Provider Class needs to stay in the istio-system namespace that we create now.
+Now we create the Secret Provider Class that will allow us to consume secrets from the Azure Key Vault.
+The Secret Provider Class needs to stay in the istio-system namespace that we create now.
 Run these commands from your Terraform folder:
 
 ```
