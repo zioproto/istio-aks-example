@@ -9,8 +9,9 @@ resource "helm_release" "prometheus" {
 }
 
 resource "kubectl_manifest" "prometheus" {
-  depends_on = [helm_release.prometheus]
-  yaml_body  = <<YAML
+  depends_on        = [helm_release.prometheus]
+  server_side_apply = true
+  yaml_body         = <<YAML
 # https://github.com/istio/istio/blob/1.15.2/samples/addons/extras/prometheus-operator.yaml
 ---
 apiVersion: monitoring.coreos.com/v1
