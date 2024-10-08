@@ -24,6 +24,12 @@ module "aks" {
   agents_type                       = "VirtualMachineScaleSets"
   agents_size                       = var.agents_size
 
+  network_contributor_role_assigned_subnet_ids = {
+  system = data.azurerm_subnet.system.id
+  alb    = data.azurerm_subnet.subnet-alb.id
+
+  }
+
   agents_labels = {
     "nodepool" : "defaultnodepool"
   }
