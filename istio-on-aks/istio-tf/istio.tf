@@ -3,7 +3,7 @@ resource "helm_release" "istio-base" {
   namespace        = "istio-system"
   create_namespace = "true"
   name             = "istio-base"
-  version          = "1.20.1"
+  version          = "1.24.1"
   repository       = "https://istio-release.storage.googleapis.com/charts"
   #force_update     = var.force_update
   #recreate_pods    = var.recreate_pods
@@ -16,7 +16,7 @@ resource "helm_release" "istiod" {
   dependency_update = true
   repository        = "https://istio-release.storage.googleapis.com/charts"
   chart             = "istiod"
-  version           = "1.20.1"
+  version           = "1.24.1"
   atomic            = true
   lint              = true
 
@@ -45,7 +45,7 @@ resource "helm_release" "istio-ingress" {
   dependency_update = true
   repository        = "https://istio-release.storage.googleapis.com/charts"
   chart             = "gateway"
-  version           = "1.20.1"
+  version           = "1.24.1"
   atomic            = true
   postrender {
     binary_path = "${path.module}/gateway-kustomize/kustomize.sh"

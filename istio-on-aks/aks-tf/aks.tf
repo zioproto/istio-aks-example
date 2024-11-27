@@ -1,6 +1,6 @@
 module "aks" {
   source                            = "Azure/aks/azurerm"
-  version                           = "9.1.0"
+  version                           = "9.2.0"
   resource_group_name               = azurerm_resource_group.this.name
   kubernetes_version                = var.kubernetes_version
   orchestrator_version              = var.kubernetes_version
@@ -23,6 +23,10 @@ module "aks" {
   agents_availability_zones         = ["1", "2"]
   agents_type                       = "VirtualMachineScaleSets"
   agents_size                       = var.agents_size
+  green_field_application_gateway_for_ingress = {
+    name = "ingress"
+    subnet_cidr = "10.52.32.0/20"
+  }
 
   network_contributor_role_assigned_subnet_ids = {
   system = data.azurerm_subnet.system.id
@@ -51,5 +55,74 @@ module "aks" {
 
   node_pools = local.node_pools
 
+  log_analytics_workspace = {
+    id = azurerm_log_analytics_workspace.this.id
+    name = azurerm_log_analytics_workspace.this.name
+    location = azurerm_resource_group.this.location
+    resource_group_name = azurerm_resource_group.this.name
+  }
+
   depends_on = [module.network]
+}
+
+resource "azurerm_log_analytics_workspace" "this" {
+  location            = azurerm_resource_group.this.location
+  name                = "log-istio-aks"
+  resource_group_name = azurerm_resource_group.this.name
+  sku                 = "PerGB2018"
+}
+
+resource "azurerm_monitor_diagnostic_setting" "aks" {
+  name                           = "amds-istio-aks"
+  target_resource_id             = module.aks.aks_id
+  log_analytics_destination_type = "Dedicated"
+  log_analytics_workspace_id     = azurerm_log_analytics_workspace.this.id
+
+  # Kubernetes API Server
+  enabled_log {
+    category = "kube-apiserver"
+  }
+  # Kubernetes Audit
+  enabled_log {
+    category = "kube-audit"
+  }
+  # Kubernetes Audit Admin Logs
+  enabled_log {
+    category = "kube-audit-admin"
+  }
+  # Kubernetes Controller Manager
+  enabled_log {
+    category = "kube-controller-manager"
+  }
+  # Kubernetes Scheduler
+  enabled_log {
+    category = "kube-scheduler"
+  }
+  #Kubernetes Cluster Autoscaler
+  enabled_log {
+    category = "cluster-autoscaler"
+  }
+  #Kubernetes Cloud Controller Manager
+  enabled_log {
+    category = "cloud-controller-manager"
+  }
+  #guard
+  enabled_log {
+    category = "guard"
+  }
+  #csi-azuredisk-controller
+  enabled_log {
+    category = "csi-azuredisk-controller"
+  }
+  #csi-azurefile-controller
+  enabled_log {
+    category = "csi-azurefile-controller"
+  }
+  #csi-snapshot-controller
+  enabled_log {
+    category = "csi-snapshot-controller"
+  }
+  metric {
+    category = "AllMetrics"
+  }
 }
