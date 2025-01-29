@@ -5,9 +5,9 @@ resource "random_string" "random" {
 }
 
 module "aks-westeurope" {
-  source                            = "github.com/Azure/terraform-azurerm-aks.git?ref=2fdde3c4d1079ce7f8119f3caccc59d9d7d117a1"
-  #source                            = "Azure/aks/azurerm"
-  #version                           = "8.0.0"
+  #source                            = "github.com/Azure/terraform-azurerm-aks.git?ref=2fdde3c4d1079ce7f8119f3caccc59d9d7d117a1"
+  source                            = "Azure/aks/azurerm"
+  version                           = "9.3.0"
   resource_group_name               = azurerm_resource_group.westeurope.name
   kubernetes_version                = var.kubernetes_version
   orchestrator_version              = var.kubernetes_version
